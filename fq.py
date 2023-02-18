@@ -1,6 +1,6 @@
 import argparse
 import sys
-from database import file_db
+from filequery import filedb
 from dataclasses import dataclass
 
 @dataclass
@@ -8,31 +8,22 @@ class FileQueryArgs:
     filename: str
     query: str
     query_file: str
+    out_file: str
 
 def parse_arguments() -> FileQueryArgs:
     parser = argparse.ArgumentParser()
     parser.add_argument('--filename', required=True, help='path to CSV or Parquet file')
     parser.add_argument('--query', required=False, help='SQL query to execute against file')
     parser.add_argument('--query_file', required=False, help='path to file with query to execute')
+    parser.add_argument('--out_file', required=False, help='file to write results to instead of printing to standard output')
     args = parser.parse_args()
 
     return FileQueryArgs(
         args.filename, 
         args.query, 
-        args.query_file
+        args.query_file,
+        args.out_file
     )
-
-def format_field(field):
-    formatted = field
-
-    if type(field) == str:
-        formatted = f'"{field}"'
-    elif field == None:
-        formatted = ''
-    else:
-        formatted = str(field)
-
-    return formatted
 
 def main():
     args = parse_arguments()
@@ -51,15 +42,16 @@ def main():
             print('error readin query file')
             sys.exit()
 
-    filetype = file_db.FileType.CSV if args.filename.endswith('.csv') else file_db.FileType.PARQUET
+    filetype = filedb.FileType.CSV if args.filename.endswith('.csv') else filedb.FileType.PARQUET
 
     try:
-        fdb = file_db.FileDb(args.filename, filetype)
-        records, result_cols = fdb.exec_query(query)
+        fdb = filedb.FileDb(args.filename, filetype)
+        query_result = fdb.exec_query(query)
 
-        # format as csv for output
-        print(','.join(map(format_field, result_cols)))
-        print('\n'.join([','.join(map(format_field, rec)) for rec in records]))
+        if args.out_file:
+            query_result.save_to_file(args.out_file)
+        else:
+            print(str(query_result))
     except Exception as e:
         print('failed to query file')
         print(e)
