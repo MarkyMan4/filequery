@@ -19,6 +19,14 @@ class FileDb:
         self.db.execute(f"create table {table_name} as select * from {read_func}('{filename}');")
 
     def exec_query(self, query: str) -> QueryResult:
+        """
+        Executes a query in the database created from the file
+
+        :param query: query to execute
+        :type query: str
+        :return: result of executing the query
+        :rtype: QueryResult
+        """
         res = self.db.execute(query)
         records = res.fetchall()
         result_cols = list(res.fetchnumpy().keys())

@@ -24,7 +24,7 @@ file name without the extension.
 
 `$ filequery --filename sample_data/test.csv --query 'select * from test'`
 
-## module usage
+## library usage
 You can also use filequery in your own programs. See the example below.
 ```
 from filequery.filedb import FileDb
