@@ -14,7 +14,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 license = {text = "MIT"}
-dynamic = ["version", "dependencies"]
+version = "0.1.0"
+dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
