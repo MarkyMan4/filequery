@@ -2,8 +2,7 @@
 Query CSV and Parquet files using SQL
 
 ## installation
-`$ git clone https://github.com/MarkyMan4/filequery.git` \
-`$ pip install .`
+`$ pip install filequery`
 
 ## CLI usage
 Run `filequery --help` to see what options are available.
