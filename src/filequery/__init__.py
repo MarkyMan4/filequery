@@ -25,7 +25,7 @@ def parse_arguments() -> FileQueryArgs:
         args.out_file
     )
 
-def main():
+def fq_cli_handler():
     args = parse_arguments()
 
     if not args.query and not args.query_file:
@@ -56,6 +56,3 @@ def main():
         print('failed to query file')
         print(e)
         sys.exit()
-
-if __name__ == '__main__':
-    main()
