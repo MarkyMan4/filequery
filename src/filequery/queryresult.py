@@ -27,5 +27,11 @@ class QueryResult:
         return f'{header_str}\n{records_str}'
 
     def save_to_file(self, filepath: str):
+        """
+        Saves query reslt as a CSV
+
+        :param filepath: path to output file
+        :type filepath: str
+        """
         with open(filepath, 'w') as outfile:
             outfile.write(str(self))
