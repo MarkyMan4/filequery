@@ -36,10 +36,7 @@ class FileDb:
         :rtype: QueryResult
         """
         res = self.db.execute(query)
-        records = res.fetchall()
-        result_cols = list(res.fetchnumpy().keys())
-
-        return QueryResult(result_cols, records)
+        return QueryResult(res.fetchnumpy())
 
     def export_query(self, query: str, output_filepath: str, filetype: int = FileType.CSV):
         """
