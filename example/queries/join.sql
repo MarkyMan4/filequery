@@ -1,0 +1,5 @@
+select * 
+from 
+    test t
+    inner join test1 t1
+    on t.col1 = t1.col1

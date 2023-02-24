@@ -9,22 +9,32 @@ READ_FUNCS = {
 }
 
 class FileDb:
-    def __init__(self, filename: str, filetype: int = FileType.CSV):
+    def __init__(self, filepath: str):
         """
         FileDb constructor
 
-        :param filename: file to read into a table
-        :type filename: str
-        :param filetype: type of file (either FileType.CSV or FileType.Parquet), defaults to FileType.CSV
-        :type filetype: int, optional
+        :param filepath: path to a file or directory containing files which will be read into tables
+        :type filepath: str
         """
         self.db = duckdb.connect(':memory:')
 
-        base_filename = os.path.basename(filename)
-        table_name = os.path.splitext(base_filename)[0]
-        
-        read_func = READ_FUNCS[filetype]
-        self.db.execute(f"create table {table_name} as select * from {read_func}('{filename}');")
+        # filename should be path to file
+        def create_table_from_file(filename: str):
+            base_filename = os.path.basename(filename)
+            filetype = FileType.CSV if base_filename.endswith('.csv') else FileType.PARQUET
+            table_name = os.path.splitext(base_filename)[0]
+            read_func = READ_FUNCS[filetype]
+
+            self.db.execute(f"create table {table_name} as select * from {read_func}('{filename}');")
+
+        if os.path.isdir(filepath):
+            # only take csv and parquet files
+            files = [file for file in os.listdir(filepath) if file.lower().endswith('.csv') or file.lower().endswith('.parquet')]
+
+            for file in files:
+                create_table_from_file(os.path.join(filepath, file))
+        else:
+            create_table_from_file(filepath)
 
     def exec_query(self, query: str) -> QueryResult:
         """
