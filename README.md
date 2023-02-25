@@ -58,7 +58,7 @@ Packages required for distribution should go in `requirements.txt`.
 To build the wheel:
 
 `$ pip install -r requirements-dev.txt` \
-`$ python -m build`
+`$ make`
 
 ## testing
 To test the CLI, cd into the `src` directory and run `filequery` as a module.
