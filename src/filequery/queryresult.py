@@ -1,4 +1,5 @@
 import numpy as np
+from tabulate import tabulate
 from typing import List, Dict, Any
 
 class QueryResult:
@@ -27,6 +28,9 @@ class QueryResult:
         records_str = '\n'.join([','.join(map(self.__format_field, rec)) for rec in self.records])
 
         return f'{header_str}\n{records_str}'
+
+    def format_as_table(self) -> str:
+        return tabulate(self.records, headers=self.result_cols, tablefmt='fancy_grid')
 
     def save_to_file(self, filepath: str):
         """

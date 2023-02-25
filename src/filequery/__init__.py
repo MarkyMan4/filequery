@@ -73,7 +73,7 @@ def fq_cli_handler():
             fdb.export_query(query, args.out_file, outfile_type)
         else:
             query_result = fdb.exec_query(query)
-            print(str(query_result))
+            print(query_result.format_as_table())
     except Exception as e:
         print('failed to query file')
         print(e)
