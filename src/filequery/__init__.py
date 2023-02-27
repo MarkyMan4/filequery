@@ -63,7 +63,7 @@ def split_queries(sql: str) -> List[str]:
     """
     queries = sql.split(';')
 
-    if queries[-1] == '':
+    if queries[-1].strip() in ('', '\n', '\r', '\t'):
         queries = queries[:-1]
 
     return queries
@@ -99,6 +99,7 @@ def fq_cli_handler():
             fdb.export_query(query, args.out_file, outfile_type)
         else:
             queries = split_queries(query)
+            print(queries)
             run_sql(fdb, queries)
     except Exception as e:
         print('failed to query file')
