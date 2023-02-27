@@ -1,7 +1,8 @@
 import argparse
 import sys
-from filequery.filedb import FileDb, FileType
 from dataclasses import dataclass
+from filequery.filedb import FileDb, FileType
+from typing import List
 
 @dataclass
 class FileQueryArgs:
@@ -51,6 +52,31 @@ def parse_arguments() -> FileQueryArgs:
         args.out_file_format
     )
 
+def split_queries(sql: str) -> List[str]:
+    """
+    Split semicolon separated SQL to a list
+
+    :param sql: SQL to split
+    :type sql: str
+    :return: List of SQL statements
+    :rtype: List[str]
+    """
+    queries = sql.split(';')
+
+    if queries[-1] == '':
+        queries = queries[:-1]
+
+    return queries
+
+def run_sql(fdb: FileDb, queries: List[str]):
+    if len(queries) > 1:
+        query_results = fdb.exec_many_queries(queries)
+        for qr in query_results:
+            print(qr.format_as_table())
+    else:
+        query_result = fdb.exec_query(queries[0])
+        print(query_result.format_as_table())
+
 def fq_cli_handler():
     args = parse_arguments()
 
@@ -72,8 +98,8 @@ def fq_cli_handler():
             outfile_type = FileType.PARQUET if args.out_file_format == 'parquet' else FileType.CSV
             fdb.export_query(query, args.out_file, outfile_type)
         else:
-            query_result = fdb.exec_query(query)
-            print(query_result.format_as_table())
+            queries = split_queries(query)
+            run_sql(fdb, queries)
     except Exception as e:
         print('failed to query file')
         print(e)

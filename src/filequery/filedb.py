@@ -2,6 +2,7 @@ import duckdb
 import os
 from .filetype import FileType
 from .queryresult import QueryResult
+from typing import List
 
 READ_FUNCS = {
     FileType.CSV: 'read_csv_auto',
@@ -38,7 +39,8 @@ class FileDb:
 
     def exec_query(self, query: str) -> QueryResult:
         """
-        Executes a query in the database created from the file
+        Executes a query in the database created from the file. If more than one semicolon separated queries are given,
+        the result will only be given for the last one. Use the exec_many_queries() to get the result from multiple queries.
 
         :param query: query to execute
         :type query: str
@@ -47,10 +49,16 @@ class FileDb:
         """
         res = self.db.execute(query)
         return QueryResult(res.fetchnumpy())
+    
+    def exec_many_queries(self, queries: List[str]) -> List[QueryResult]:
+        results = [self.exec_query(query) for query in queries]
+        return results
 
     def export_query(self, query: str, output_filepath: str, filetype: int = FileType.CSV):
         """
         Writes query result to a file
+
+        TODO: allow multiple queries to be expored to multiple files
 
         :param query: query to execute
         :type query: str
