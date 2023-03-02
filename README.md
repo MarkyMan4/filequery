@@ -29,7 +29,7 @@ file name without the extension.
 `$ filequery --filesdir example/data --query 'select * from test inner join test1 on test.col1 = test1.col1'` \
 `$ filequery --filesdir example/data --query_file example/queries/join.sql`
 
-## library usage
+## module usage
 You can also use filequery in your own programs. See the example below.
 ```
 from filequery.filedb import FileDb

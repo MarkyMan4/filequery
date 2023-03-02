@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 license = {text = "MIT"}
-version = "0.1.4"
+version = "0.1.41"
 dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
@@ -22,3 +22,6 @@ dependencies = {file = ["requirements.txt"]}
 
 [project.scripts]
 filequery = "filequery:fq_cli_handler"
+
+[project.urls]
+repository = "https://github.com/MarkyMan4/filequery"
