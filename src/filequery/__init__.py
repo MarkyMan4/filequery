@@ -1,17 +1,9 @@
 import argparse
 import sys
-from dataclasses import dataclass
+from filequery.config_parser import ConfigParser
+from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
 from typing import List
-
-@dataclass
-class FileQueryArgs:
-    filename: str
-    filesdir: str
-    query: str
-    query_file: str
-    out_file: str
-    out_file_format: str
 
 def parse_arguments() -> FileQueryArgs:
     parser = argparse.ArgumentParser()
@@ -24,40 +16,50 @@ def parse_arguments() -> FileQueryArgs:
     parser.add_argument('--config', required=False, help='path to JSON config file')
     args = parser.parse_args()
 
-    # if config file given, cannot specify any other args
-    if args.config and (args.filename or args.filedir or args.query or args.query_file or args.out_file or args.out_file_format):
-        print('if you provide a config file, you cannot provide any other arguments\n')
+    cli_args = None
+
+    # if config file given, all other arguments are ignored
+    if args.config:
+        try:
+            config_parser = ConfigParser(args.config)
+            cli_args = config_parser.args
+        except:
+            sys.exit()
+    else:
+        cli_args = FileQueryArgs(
+            args.filename, 
+            args.filesdir,
+            args.query, 
+            args.query_file,
+            args.out_file,
+            args.out_file_format
+        )
+
+    err = validate_args(cli_args)
+
+    if(err):
+        print(f'{err}\n')
         parser.print_help()
         sys.exit()
+
+    return cli_args
+
+def validate_args(args: FileQueryArgs) -> str:
+    err_msg = None
 
     if not args.filename and not args.filesdir:
-        print('you must provide either a file name or a path to a directory containing CSV and/or Parquet files\n')
-        parser.print_help()
-        sys.exit()
+        err_msg = 'you must provide either a file name or a path to a directory containing CSV and/or Parquet files'
 
     if args.filename and args.filesdir:
-        print('you cannot provide both filename and filesdir\n')
-        parser.print_help()
-        sys.exit()
+        err_msg = 'you cannot provide both filename and filesdir'
 
     if not args.query and not args.query_file:
-        print('you must provide either a query or a path to a file with a query\n')
-        parser.print_help()
-        sys.exit()
+        err_msg = 'you must provide either a query or a path to a file with a query'
 
     if args.filename and args.filesdir:
-        print('you cannot provide both query and query_file\n')
-        parser.print_help()
-        sys.exit()
-
-    return FileQueryArgs(
-        args.filename, 
-        args.filesdir,
-        args.query, 
-        args.query_file,
-        args.out_file,
-        args.out_file_format
-    )
+        err_msg = 'you cannot provide both query and query_file'
+        
+    return err_msg
 
 def split_queries(sql: str) -> List[str]:
     """
