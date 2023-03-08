@@ -21,7 +21,14 @@ def parse_arguments() -> FileQueryArgs:
     parser.add_argument('--query_file', required=False, help='path to file with query to execute')
     parser.add_argument('--out_file', required=False, help='file to write results to instead of printing to standard output')
     parser.add_argument('--out_file_format', required=False, help='either csv or parquet, defaults to csv')
+    parser.add_argument('--config', required=False, help='path to JSON config file')
     args = parser.parse_args()
+
+    # if config file given, cannot specify any other args
+    if args.config and (args.filename or args.filedir or args.query or args.query_file or args.out_file or args.out_file_format):
+        print('if you provide a config file, you cannot provide any other arguments\n')
+        parser.print_help()
+        sys.exit()
 
     if not args.filename and not args.filesdir:
         print('you must provide either a file name or a path to a directory containing CSV and/or Parquet files\n')
