@@ -1,0 +1,4 @@
+{
+    "filesdir": "../example/data",
+    "query_file": "../example/queries/multi_query.sql"
+}

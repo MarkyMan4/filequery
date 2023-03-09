@@ -1,0 +1,4 @@
+{
+    "filename": "../example/test.csv",
+    "query": "select col1, col2 from test"
+}
