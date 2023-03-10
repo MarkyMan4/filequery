@@ -5,8 +5,7 @@ from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
 from typing import List
 
-def parse_arguments() -> FileQueryArgs:
-    parser = argparse.ArgumentParser()
+def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
     parser.add_argument('--filename', required=False, help='path to CSV or Parquet file')
     parser.add_argument('--filesdir', required=False, help='path to a directory which can contain a combination of CSV and Parquet files')
     parser.add_argument('--query', required=False, help='SQL query to execute against file')
@@ -34,13 +33,6 @@ def parse_arguments() -> FileQueryArgs:
             args.out_file,
             args.out_file_format
         )
-
-    err = validate_args(cli_args)
-
-    if(err):
-        print(f'{err}\n')
-        parser.print_help()
-        sys.exit()
 
     return cli_args
 
@@ -72,7 +64,7 @@ def validate_args(args: FileQueryArgs) -> str:
     if not args.query and not args.query_file:
         err_msg = 'you must provide either a query or a path to a file with a query'
 
-    if args.filename and args.filesdir:
+    if args.query and args.query_file:
         err_msg = 'you cannot provide both query and query_file'
         
     return err_msg
@@ -102,9 +94,9 @@ def run_sql(fdb: FileDb, queries: List[str]):
         query_result = fdb.exec_query(queries[0])
         print(query_result.format_as_table())
 
-def fq_cli_handler():
-    args = parse_arguments()
-
+# determines what to do based on arguments provided
+# having this separate from fq_cli_handler() makes unit testing easier
+def handle_args(args: FileQueryArgs):
     query = args.query
 
     if args.query_file:
@@ -130,3 +122,16 @@ def fq_cli_handler():
         print('failed to query file')
         print(e)
         sys.exit()
+
+def fq_cli_handler():
+    parser = argparse.ArgumentParser()
+    args = parse_arguments(parser)
+
+    err = validate_args(args)
+
+    if(err):
+        print(f'{err}\n')
+        parser.print_help()
+        sys.exit()
+        
+    handle_args(args)

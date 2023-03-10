@@ -10,6 +10,8 @@ sys.path.append(src_path)
 sample_data_path = os.path.join(os.getcwd(), 'example')
 sys.path.append(sample_data_path)
 
+from filequery import validate_args
+from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb
 from filequery.queryresult import QueryResult
 
@@ -52,6 +54,64 @@ class TestFileQuery(unittest.TestCase):
         ])
 
         self.assertEqual(len(res), 3)
+
+class TestFileQueryCli(unittest.TestCase):
+    def test_no_filename_or_filesdir(self):
+        args = FileQueryArgs(
+            filename=None,
+            filesdir=None,
+            query='select * from test',
+            query_file=None,
+            out_file=None,
+            out_file_format=None
+        )
+
+        err = validate_args(args)
+
+        self.assertIsNotNone(err)
+
+    def test_provide_filename_and_filesdir(self):
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir='example/data',
+            query='select * from test',
+            query_file=None,
+            out_file=None,
+            out_file_format=None
+        )
+
+        err = validate_args(args)
+
+        self.assertIsNotNone(err)
+
+    def test_no_query_or_query_file(self):
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query=None,
+            query_file=None,
+            out_file=None,
+            out_file_format=None
+        )
+
+        err = validate_args(args)
+
+        self.assertIsNotNone(err)
+
+    def test_provide_query_and_query_file(self):
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test',
+            query_file='example/queries/join.sql',
+            out_file=None,
+            out_file_format=None
+        )
+
+        err = validate_args(args)
+
+        self.assertIsNotNone(err)
+
 
 if __name__ == '__main__':
     unittest.main()
