@@ -1,6 +1,6 @@
 import argparse
+import json
 import sys
-from filequery.config_parser import ConfigParser
 from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
 from typing import List
@@ -21,9 +21,9 @@ def parse_arguments() -> FileQueryArgs:
     # if config file given, all other arguments are ignored
     if args.config:
         try:
-            config_parser = ConfigParser(args.config)
-            cli_args = config_parser.args
+            cli_args = parse_config_file(args.config)
         except:
+            print('failed to load config file')
             sys.exit()
     else:
         cli_args = FileQueryArgs(
@@ -43,6 +43,22 @@ def parse_arguments() -> FileQueryArgs:
         sys.exit()
 
     return cli_args
+
+def parse_config_file(config_file: str):
+    args = None
+
+    with open(config_file) as cf:
+        config = json.load(cf)
+        args = FileQueryArgs(
+            config.get('filename'),
+            config.get('filesdir'),
+            config.get('query'),
+            config.get('query_file'),
+            config.get('out_file'),
+            config.get('out_file_format'),
+        )
+    
+    return args
 
 def validate_args(args: FileQueryArgs) -> str:
     err_msg = None
