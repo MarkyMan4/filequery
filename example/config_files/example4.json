@@ -1,0 +1,6 @@
+{
+    "filesdir": "../example/data",
+    "query_file": "../example/queries/join.sql",
+    "out_file": "result.parquet",
+    "out_file_format": "parquet"
+}

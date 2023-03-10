@@ -1,0 +1,5 @@
+{
+    "filesdir": "../example/data",
+    "query_file": "../example/queries/join.sql",
+    "out_file": "result.csv"
+}
