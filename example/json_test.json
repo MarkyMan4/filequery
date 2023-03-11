@@ -1,0 +1,15 @@
+{
+    "id": 1,
+    "val1": "test 1",
+    "val2": 1.0,
+    "nested": {
+        "nest_id": 2,
+        "nest_val": "nested test 1"
+    },
+    "list": [
+        1,
+        2,
+        3,
+        4
+    ]
+}

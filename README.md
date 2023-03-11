@@ -1,5 +1,5 @@
 # filequery
-Query CSV and Parquet files using SQL
+Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
 
 ## installation
 `$ pip install filequery`
@@ -12,8 +12,8 @@ usage: __main__.py [-h] [--filename FILENAME] [--filesdir FILESDIR] [--query QUE
 
 options:
   -h, --help            show this help message and exit
-  --filename FILENAME   path to CSV or Parquet file
-  --filesdir FILESDIR   path to a directory which can contain a combination of CSV and Parquet files
+  --filename FILENAME   path to a CSV, Parquet or JSON file
+  --filesdir FILESDIR   path to a directory which can contain a combination of CSV, Parquet and JSON files
   --query QUERY         SQL query to execute against file
   --query_file QUERY_FILE
                         path to file with query to execute
@@ -27,8 +27,10 @@ For basic usage, provide a path to a CSV or Parquet file and a query to execute 
 file name without the extension.
 
 `$ filequery --filename example/test.csv --query 'select * from test'`\
+`$ filequery --filename example/json_test.json --query 'select nested.nest_id, nested.nested_val from json_test'`\
 `$ filequery --filesdir example/data --query 'select * from test inner join test1 on test.col1 = test1.col1'` \
-`$ filequery --filesdir example/data --query_file example/queries/join.sql`
+`$ filequery --filesdir example/data --query_file example/queries/join.sql`\
+`$ filequery --filesdir example/data --query_file example/queries/json_csv_join.sql`
 
 You can also provide a config file instead of specifying the arguments when running the command.
 

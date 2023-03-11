@@ -5,7 +5,7 @@ cffi==1.15.1
 charset-normalizer==3.0.1
 cryptography==39.0.1
 docutils==0.19
-duckdb==0.6.1
+duckdb==0.7.1
 idna==3.4
 importlib-metadata==6.0.0
 jaraco.classes==3.2.3

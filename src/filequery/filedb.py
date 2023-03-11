@@ -6,7 +6,8 @@ from typing import List
 
 READ_FUNCS = {
     FileType.CSV: 'read_csv_auto',
-    FileType.PARQUET: 'read_parquet'
+    FileType.PARQUET: 'read_parquet',
+    FileType.JSON: 'read_json_auto'
 }
 
 class FileDb:
@@ -21,8 +22,14 @@ class FileDb:
 
         # filename should be path to file
         def create_table_from_file(filename: str):
-            base_filename = os.path.basename(filename)
-            filetype = FileType.CSV if base_filename.endswith('.csv') else FileType.PARQUET
+            base_filename = os.path.basename(filename).lower()
+            filetype = FileType.CSV
+            
+            if base_filename.endswith('.parquet'):
+                filetype = FileType.PARQUET
+            elif base_filename.endswith('.json'):
+                filetype = FileType.JSON
+            
             table_name = os.path.splitext(base_filename)[0]
             read_func = READ_FUNCS[filetype]
 
@@ -30,7 +37,7 @@ class FileDb:
 
         if os.path.isdir(filepath):
             # only take csv and parquet files
-            files = [file for file in os.listdir(filepath) if file.lower().endswith('.csv') or file.lower().endswith('.parquet')]
+            files = [file for file in os.listdir(filepath) if file.lower().endswith('.csv') or file.lower().endswith('.parquet') or file.lower().endswith('.json')]
 
             for file in files:
                 create_table_from_file(os.path.join(filepath, file))

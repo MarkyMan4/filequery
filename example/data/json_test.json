@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "val1": "test 1",
+        "val2": 1.0,
+        "nested": {
+            "nest_id": 123,
+            "nest_val": "nested test 1"
+        }
+    },
+    {
+        "id": 2,
+        "val1": "test 2",
+        "val2": 2.0,
+        "nested": {
+            "nest_id": 456,
+            "nest_val": "nested test 2"
+        }
+    }
+]
