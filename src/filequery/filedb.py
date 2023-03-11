@@ -37,7 +37,7 @@ class FileDb:
 
         if os.path.isdir(filepath):
             # only take csv and parquet files
-            files = [file for file in os.listdir(filepath) if file.lower().endswith('.csv') or file.lower().endswith('.parquet')]
+            files = [file for file in os.listdir(filepath) if file.lower().endswith('.csv') or file.lower().endswith('.parquet') or file.lower().endswith('.json')]
 
             for file in files:
                 create_table_from_file(os.path.join(filepath, file))
