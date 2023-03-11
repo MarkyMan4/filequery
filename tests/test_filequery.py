@@ -55,6 +55,36 @@ class TestFileQuery(unittest.TestCase):
 
         self.assertEqual(len(res), 3)
 
+    def test_select_star_json(self):
+        fdb = FileDb('example/json_test.json')
+        res = fdb.exec_query('select * from json_test')
+
+        self.assertEqual(res.records[0][0], 1)
+        self.assertEqual(res.records[0][1], 'test 1')
+        self.assertEqual(res.records[0][2], 1.0)
+
+    def test_select_struct_field(self):
+        fdb = FileDb('example/json_test.json')
+        res = fdb.exec_query('select nested.nest_id, nested.nest_val from json_test')
+
+        self.assertEqual(res.records[0][0], 2)
+        self.assertEqual(res.records[0][1], 'nested test 1')
+
+    def test_select_list_field(self):
+        fdb = FileDb('example/json_test.json')
+        res = fdb.exec_query('select list[1], list[2], list[3], list[4] from json_test')
+
+        self.assertEqual(res.records[0][0], 1)
+        self.assertEqual(res.records[0][1], 2)
+        self.assertEqual(res.records[0][2], 3)
+        self.assertEqual(res.records[0][3], 4)
+
+    def test_json_list_file(self):
+        fdb = FileDb('example/json_list_test.json')
+        res = fdb.exec_query('select * from json_list_test')
+
+        self.assertEqual(len(res.records), 3)
+
 class TestFileQueryCli(unittest.TestCase):
     def test_no_filename_or_filesdir(self):
         args = FileQueryArgs(

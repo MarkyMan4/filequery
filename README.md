@@ -1,5 +1,5 @@
 # filequery
-Query CSV and Parquet files using SQL
+Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
 
 ## installation
 `$ pip install filequery`
