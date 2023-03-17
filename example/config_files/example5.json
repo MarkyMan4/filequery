@@ -1,0 +1,9 @@
+{
+    "filesdir": "../example/data",
+    "query_file": "../example/queries/multi_query.sql",
+    "out_file": [
+        "result1.csv",
+        "result2.csv",
+        "result3.csv"
+    ]
+}

@@ -65,8 +65,6 @@ class FileDb:
         """
         Writes query result to a file
 
-        TODO: allow multiple queries to be expored to multiple files
-
         :param query: query to execute
         :type query: str
         :param output_filepath: path to output file

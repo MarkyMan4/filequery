@@ -144,12 +144,15 @@ class TestFileQueryCli(unittest.TestCase):
 
         self.assertIsNotNone(err)
 
+    # TODO test handle_args and output files
+
 
 if __name__ == '__main__':
     unittest.main()
     
     # for one-off testing
     # fdb = FileDb('example/test.csv')
+    # fdb.export_database('test')
     # res = fdb.exec_query('select * from test')
     
     # print(res)

@@ -10,7 +10,7 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
     parser.add_argument('--filesdir', required=False, help='path to a directory which can contain a combination of CSV, Parquet and JSON files')
     parser.add_argument('--query', required=False, help='SQL query to execute against file')
     parser.add_argument('--query_file', required=False, help='path to file with query to execute')
-    parser.add_argument('--out_file', required=False, help='file to write results to instead of printing to standard output')
+    parser.add_argument('--out_file', nargs='+', required=False, help='file to write results to instead of printing to standard output')
     parser.add_argument('--out_file_format', required=False, help='either csv or parquet, defaults to csv')
     parser.add_argument('--config', required=False, help='path to JSON config file')
     args = parser.parse_args()
@@ -41,12 +41,18 @@ def parse_config_file(config_file: str):
 
     with open(config_file) as cf:
         config = json.load(cf)
+
+        # need to convert outfile to list if a single outfile is specified
+        outfiles = config.get('out_file')
+        if outfiles and type(outfiles) == str:
+            outfiles = [config.get('out_file')]
+
         args = FileQueryArgs(
             config.get('filename'),
             config.get('filesdir'),
             config.get('query'),
             config.get('query_file'),
-            config.get('out_file'),
+            outfiles,
             config.get('out_file_format'),
         )
     
@@ -111,12 +117,19 @@ def handle_args(args: FileQueryArgs):
         filepath = args.filename if args.filename else args.filesdir
         fdb = FileDb(filepath)
 
+        queries = split_queries(query)
+
         if args.out_file:
+            if len(args.out_file) != len(queries):
+                print('number of queries and output files do not match')
+                sys.exit()
+            
             outfile_type = FileType.PARQUET if args.out_file_format == 'parquet' else FileType.CSV
-            fdb.export_query(query, args.out_file, outfile_type)
+
+            for i in range(len(queries)):
+                fdb.export_query(queries[i], args.out_file[i], outfile_type)
         else:
             queries = split_queries(query)
-            print(queries)
             run_sql(fdb, queries)
     except Exception as e:
         print('failed to query file')

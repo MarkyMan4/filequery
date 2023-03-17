@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class FileQueryArgs:
@@ -6,5 +7,5 @@ class FileQueryArgs:
     filesdir: str
     query: str
     query_file: str
-    out_file: str
+    out_file: List[str]
     out_file_format: str
