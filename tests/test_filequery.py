@@ -86,6 +86,17 @@ class TestFileQuery(unittest.TestCase):
         self.assertEqual(len(res.records), 3)
 
     # TODO add tests for joining JSON, CSV and parquet files
+    def test_join_json_and_csv(self):
+        fdb = FileDb('example/data/')
+        res = fdb.exec_query("""
+            select *
+            from 
+                test t1
+                inner join test1 t2
+                on t1.col1 = t2.col1;
+        """)
+
+        self.assertEqual(len(res.records), 2)
 
 class TestFileQueryCli(unittest.TestCase):
     def test_no_filename_or_filesdir(self):
