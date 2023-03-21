@@ -2,7 +2,9 @@
 Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
 
 ## installation
-`$ pip install filequery`
+```bash
+pip install filequery
+```
 
 ## CLI usage
 Run `filequery --help` to see what options are available.
@@ -51,7 +53,9 @@ filequery --filesdir example/test.csv --query 'select * from test; select sum(co
 
 You can also provide a config file instead of specifying the arguments when running the command.
 
-`$ filequery --config <path to config file>`
+```bash
+filequery --config <path to config file>
+```
 
 The config file should be a json file. See example config file contents below.
 
@@ -102,14 +106,20 @@ Packages required for distribution should go in `requirements.txt`.
 
 To build the wheel:
 
-`$ pip install -r requirements-dev.txt` \
-`$ make`
+```bash
+pip install -r requirements-dev.txt
+make
+```
 
 ## testing
 To test the CLI, cd into the `src` directory and run `filequery` as a module.
 
-`$ python -m filequery <args>`
+```bash
+python -m filequery ...
+```
 
 To run unit tests, stay in the root of the project. The unit tests add `src` to the path so `filequery` can be imported properly.
 
-`$ python tests/<test file>`
+```bash
+python tests/test_filequery.py
+```
