@@ -10,9 +10,9 @@ sys.path.append(src_path)
 sample_data_path = os.path.join(os.getcwd(), 'example')
 sys.path.append(sample_data_path)
 
-from filequery import validate_args
+from filequery import validate_args, handle_args
 from filequery.file_query_args import FileQueryArgs
-from filequery.filedb import FileDb
+from filequery.filedb import FileDb, FileType
 from filequery.queryresult import QueryResult
 
 class TestFileQuery(unittest.TestCase):
@@ -99,6 +99,11 @@ class TestFileQuery(unittest.TestCase):
         self.assertEqual(len(res.records), 2)
 
 class TestFileQueryCli(unittest.TestCase):
+
+    #####################################################
+    # tests for invalid arguments
+    #####################################################
+
     def test_no_filename_or_filesdir(self):
         args = FileQueryArgs(
             filename=None,
@@ -155,7 +160,111 @@ class TestFileQueryCli(unittest.TestCase):
 
         self.assertIsNotNone(err)
 
-    # TODO test handle_args and output files
+    #####################################################
+    # tests for handling arguments 
+    #####################################################
+
+    def handle_args_single_out_file(self, args: FileQueryArgs, out_file: str):
+        # call handle_args for creating an output file, check that the file exists, then delete the file
+        handle_args(args)
+        self.assertTrue(os.path.exists(out_file))
+
+        # cleanup
+        os.remove(out_file)
+
+    def handle_args_multiple_out_files(self, args: FileQueryArgs):
+        # call handle_args for creating multiple output files, check that each file exists, then delete the files
+        handle_args(args)
+
+        for file in args.out_file:
+            self.assertTrue(os.path.exists(file))
+
+            # cleanup
+            os.remove(file)
+
+    def test_single_output_file_default(self):
+        out_file = 'test_result.csv'
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test',
+            query_file=None,
+            out_file=[out_file],
+            out_file_format=None
+        )
+
+        self.handle_args_single_out_file(args, out_file)
+
+    def test_single_output_file_csv(self):
+        out_file = 'test_result.csv'
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test',
+            query_file=None,
+            out_file=[out_file],
+            out_file_format='csv'
+        )
+
+        self.handle_args_single_out_file(args, out_file)
+
+    def test_single_output_file_parquet(self):
+        out_file = 'test_result.parquet'
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test',
+            query_file=None,
+            out_file=[out_file],
+            out_file_format='parquet'
+        )
+
+        self.handle_args_single_out_file(args, out_file)
+
+    def test_multiple_output_files_default(self):
+        out_files = ['test_result1.csv', 'test_result2.csv', 'test_result3.csv']
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
+            query_file=None,
+            out_file=out_files,
+            out_file_format=None
+        )
+
+        self.handle_args_multiple_out_files(args)
+
+    def test_multiple_output_files_csv(self):
+        out_files = ['test_result1.csv', 'test_result2.csv', 'test_result3.csv']
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
+            query_file=None,
+            out_file=out_files,
+            out_file_format='csv'
+        )
+
+        self.handle_args_multiple_out_files(args)
+
+    def test_multiple_output_files_parquet(self):
+        out_files = ['test_result1.parquet', 'test_result2.parquet', 'test_result3.parquet']
+
+        args = FileQueryArgs(
+            filename='example/test.csv',
+            filesdir=None,
+            query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
+            query_file=None,
+            out_file=out_files,
+            out_file_format='parquet'
+        )
+
+        self.handle_args_multiple_out_files(args)
 
 
 if __name__ == '__main__':
