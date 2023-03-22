@@ -111,7 +111,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file=None,
             out_file=None,
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         err = validate_args(args)
@@ -125,7 +126,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file=None,
             out_file=None,
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         err = validate_args(args)
@@ -139,7 +141,8 @@ class TestFileQueryCli(unittest.TestCase):
             query=None,
             query_file=None,
             out_file=None,
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         err = validate_args(args)
@@ -153,7 +156,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file='example/queries/join.sql',
             out_file=None,
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         err = validate_args(args)
@@ -191,7 +195,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file=None,
             out_file=[out_file],
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         self.handle_args_single_out_file(args, out_file)
@@ -205,7 +210,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file=None,
             out_file=[out_file],
-            out_file_format='csv'
+            out_file_format='csv',
+            delimiter=None
         )
 
         self.handle_args_single_out_file(args, out_file)
@@ -219,7 +225,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test',
             query_file=None,
             out_file=[out_file],
-            out_file_format='parquet'
+            out_file_format='parquet',
+            delimiter=None
         )
 
         self.handle_args_single_out_file(args, out_file)
@@ -233,7 +240,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
             query_file=None,
             out_file=out_files,
-            out_file_format=None
+            out_file_format=None,
+            delimiter=None
         )
 
         self.handle_args_multiple_out_files(args)
@@ -247,7 +255,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
             query_file=None,
             out_file=out_files,
-            out_file_format='csv'
+            out_file_format='csv',
+            delimiter=None
         )
 
         self.handle_args_multiple_out_files(args)
@@ -261,7 +270,8 @@ class TestFileQueryCli(unittest.TestCase):
             query='select * from test; select sum(col3) from test; select col1 from test where col1 = 1;',
             query_file=None,
             out_file=out_files,
-            out_file_format='parquet'
+            out_file_format='parquet',
+            delimiter=None
         )
 
         self.handle_args_multiple_out_files(args)

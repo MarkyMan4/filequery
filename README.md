@@ -10,7 +10,7 @@ pip install filequery
 Run `filequery --help` to see what options are available.
 
 ```
-usage: __main__.py [-h] [--filename FILENAME] [--filesdir FILESDIR] [--query QUERY] [--query_file QUERY_FILE] [--out_file OUT_FILE [OUT_FILE ...]] [--out_file_format OUT_FILE_FORMAT] [--config CONFIG]
+usage: __main__.py [-h] [--filename FILENAME] [--filesdir FILESDIR] [--query QUERY] [--query_file QUERY_FILE] [--out_file OUT_FILE [OUT_FILE ...]] [--out_file_format OUT_FILE_FORMAT] [--delimiter DELIMITER] [--config CONFIG]
 
 options:
   -h, --help            show this help message and exit
@@ -23,6 +23,8 @@ options:
                         file to write results to instead of printing to standard output
   --out_file_format OUT_FILE_FORMAT
                         either csv or parquet, defaults to csv
+  --delimiter DELIMITER
+                        delimiter to use when printing result or writing to CSV file
   --config CONFIG       path to JSON config file
 ```
 
