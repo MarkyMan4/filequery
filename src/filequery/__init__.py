@@ -12,6 +12,7 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
     parser.add_argument('--query_file', required=False, help='path to file with query to execute')
     parser.add_argument('--out_file', nargs='+', required=False, help='file to write results to instead of printing to standard output')
     parser.add_argument('--out_file_format', required=False, help='either csv or parquet, defaults to csv')
+    parser.add_argument('--delimiter', required=False, help='delimiter to use when printing result or writing to CSV file')
     parser.add_argument('--config', required=False, help='path to JSON config file')
     args = parser.parse_args()
 
@@ -31,7 +32,8 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
             args.query, 
             args.query_file,
             args.out_file,
-            args.out_file_format
+            args.out_file_format,
+            args.delimiter
         )
 
     return cli_args
@@ -95,10 +97,12 @@ def run_sql(fdb: FileDb, queries: List[str]):
     if len(queries) > 1:
         query_results = fdb.exec_many_queries(queries)
         for qr in query_results:
-            print(qr.format_as_table())
+            # print(qr.format_as_table())
+            yield qr
     else:
         query_result = fdb.exec_query(queries[0])
-        print(query_result.format_as_table())
+        # print(query_result.format_as_table())
+        yield query_result
 
 # determines what to do based on arguments provided
 # having this separate from fq_cli_handler() makes unit testing easier
@@ -127,10 +131,12 @@ def handle_args(args: FileQueryArgs):
             outfile_type = FileType.PARQUET if args.out_file_format == 'parquet' else FileType.CSV
 
             for i in range(len(queries)):
-                fdb.export_query(queries[i], args.out_file[i], outfile_type)
+                delimiter = args.delimiter if args.delimiter else ','
+                fdb.export_query(queries[i], args.out_file[i], outfile_type, delimiter=delimiter)
         else:
             queries = split_queries(query)
-            run_sql(fdb, queries)
+            for query_result in run_sql(fdb, queries):
+                print(query_result.format_as_table(args.delimiter))
     except Exception as e:
         print('failed to query file')
         print(e)

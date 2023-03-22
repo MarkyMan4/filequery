@@ -9,3 +9,4 @@ class FileQueryArgs:
     query_file: str
     out_file: List[str]
     out_file_format: str
+    delimiter: str
