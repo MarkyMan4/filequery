@@ -56,6 +56,7 @@ def parse_config_file(config_file: str):
             config.get('query_file'),
             outfiles,
             config.get('out_file_format'),
+            config.get('delimiter')
         )
     
     return args
