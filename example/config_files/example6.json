@@ -1,0 +1,6 @@
+{
+    "filename": "../example/test.csv",
+    "query": "select col1, col2, col3 from test",
+    "out_file": "pipe_delim.csv",
+    "delimiter": "|"
+}

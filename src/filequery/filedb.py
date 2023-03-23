@@ -61,11 +61,9 @@ class FileDb:
         results = [self.exec_query(query) for query in queries]
         return results
 
-    def export_query(self, query: str, output_filepath: str, filetype: int = FileType.CSV):
+    def export_query(self, query: str, output_filepath: str, filetype: int = FileType.CSV, **kwargs):
         """
         Writes query result to a file
-
-        TODO: allow multiple queries to be expored to multiple files
 
         :param query: query to execute
         :type query: str
@@ -75,6 +73,7 @@ class FileDb:
         :type filetype: FileType.CSV
         """
         if filetype == FileType.CSV:
-            self.db.execute(f"copy ({query}) to '{output_filepath}' (header, delimiter ',')")
+            delimiter = ',' if 'delimiter' not in kwargs else kwargs['delimiter']
+            self.db.execute(f"copy ({query}) to '{output_filepath}' (header, delimiter '{delimiter}')")
         elif filetype == FileType.PARQUET:
             self.db.execute(f"copy ({query}) to '{output_filepath}'")
