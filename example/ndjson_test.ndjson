@@ -1,0 +1,4 @@
+{"id": 1, "value": "abc", "nested": {"subid": 2, "subval": 1.0}}
+{"id": 2, "value": "def", "nested": {"subid": 3, "subval": 2.0}}
+{"id": 3, "value": "ghi", "nested": {"subid": 4, "subval": 3.0}}
+{"id": 4, "value": "jkl", "nested": {"subid": 5, "subval": 4.0}}

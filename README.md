@@ -53,6 +53,10 @@ filequery --filesdir example/data --query_file example/queries/json_csv_join.sql
 filequery --filesdir example/test.csv --query 'select * from test; select sum(col3) from test;' # output multiple query results to multiple files
 ```
 
+```bash
+filequery --filename example/ndjson_test.ndjson --query 'select id, value, nested.subid, nested.subval from ndjson_test' # query nested JSON in an ndjson file
+```
+
 You can also provide a config file instead of specifying the arguments when running the command.
 
 ```bash

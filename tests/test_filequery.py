@@ -98,6 +98,12 @@ class TestFileQuery(unittest.TestCase):
 
         self.assertEqual(len(res.records), 2)
 
+    def test_ndjson_file(self):
+        fdb = FileDb('example/ndjson_test.ndjson')
+        res = fdb.exec_query('select id, value, nested.subid, nested.subval from ndjson_test')
+
+        self.assertEqual(len(res.records), 4)
+
 class TestFileQueryCli(unittest.TestCase):
 
     #####################################################

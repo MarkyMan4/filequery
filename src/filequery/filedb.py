@@ -7,7 +7,8 @@ from typing import List
 READ_FUNCS = {
     FileType.CSV: 'read_csv_auto',
     FileType.PARQUET: 'read_parquet',
-    FileType.JSON: 'read_json_auto'
+    FileType.JSON: 'read_json_auto',
+    FileType.NDJSON: 'read_ndjson_auto'
 }
 
 class FileDb:
@@ -29,6 +30,8 @@ class FileDb:
                 filetype = FileType.PARQUET
             elif base_filename.endswith('.json'):
                 filetype = FileType.JSON
+            elif base_filename.endswith('.ndjson'):
+                filetype = FileType.NDJSON
             
             table_name = os.path.splitext(base_filename)[0]
             read_func = READ_FUNCS[filetype]
