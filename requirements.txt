@@ -1,3 +1,6 @@
-duckdb==0.8.1
+duckdb==0.9.1
+markdown-it-py==3.0.0
+mdurl==0.1.2
 numpy==1.24.2
-tabulate==0.9.0
+Pygments==2.16.1
+rich==13.6.0
