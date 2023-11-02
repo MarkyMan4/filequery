@@ -9,31 +9,35 @@ from filequery.filedb import FileDb, FileType
 
 def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
     parser.add_argument(
-        "--filename", required=False, help="path to a CSV, Parquet or JSON file"
+        "-f", "--filename", required=False, help="path to a CSV, Parquet or JSON file"
     )
     parser.add_argument(
+        "-d",
         "--filesdir",
         required=False,
         help="path to a directory which can contain a combination of CSV, Parquet and JSON files",
     )
     parser.add_argument(
-        "--query", required=False, help="SQL query to execute against file"
+        "-q", "--query", required=False, help="SQL query to execute against file"
     )
     parser.add_argument(
-        "--query_file", required=False, help="path to file with query to execute"
+        "-Q", "--query_file", required=False, help="path to file with query to execute"
     )
     parser.add_argument(
+        "-o",
         "--out_file",
         nargs="+",
         required=False,
         help="file to write results to instead of printing to standard output",
     )
     parser.add_argument(
+        "-F",
         "--out_file_format",
         required=False,
         help="either csv or parquet, defaults to csv",
     )
     parser.add_argument(
+        "-D",
         "--delimiter",
         required=False,
         help="delimiter to use when printing result or writing to CSV file",

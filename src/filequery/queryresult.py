@@ -54,7 +54,7 @@ class QueryResult:
         :rtype: str
         """
         if delimiter:
-            return self.format_with_delimiter(delimiter)
+            print(self.format_with_delimiter(delimiter))
         else:
             # otherwise create a table using rich
             table = Table()
