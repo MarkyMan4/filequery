@@ -5,6 +5,13 @@ Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any
 ![out](https://github.com/MarkyMan4/filequery/assets/37815834/38b6f69b-297f-4913-826e-89ffbfe483b3)
 
 ## installation
+
+```bash
+pipx install filequery
+```
+
+or
+
 ```bash
 pip install filequery
 ```
@@ -13,20 +20,23 @@ pip install filequery
 Run `filequery --help` to see what options are available.
 
 ```
-usage: __main__.py [-h] [--filename FILENAME] [--filesdir FILESDIR] [--query QUERY] [--query_file QUERY_FILE] [--out_file OUT_FILE [OUT_FILE ...]] [--out_file_format OUT_FILE_FORMAT] [--delimiter DELIMITER] [--config CONFIG]
+usage: filequery [-h] [-f FILENAME] [-d FILESDIR] [-q QUERY] [-Q QUERY_FILE] [-o OUT_FILE [OUT_FILE ...]] [-F OUT_FILE_FORMAT] [-D DELIMITER] [--config CONFIG]
 
 options:
   -h, --help            show this help message and exit
-  --filename FILENAME   path to a CSV, Parquet or JSON file
-  --filesdir FILESDIR   path to a directory which can contain a combination of CSV, Parquet and JSON files
-  --query QUERY         SQL query to execute against file
-  --query_file QUERY_FILE
+  -f FILENAME, --filename FILENAME
+                        path to a CSV, Parquet or JSON file
+  -d FILESDIR, --filesdir FILESDIR
+                        path to a directory which can contain a combination of CSV, Parquet and JSON files
+  -q QUERY, --query QUERY
+                        SQL query to execute against file
+  -Q QUERY_FILE, --query_file QUERY_FILE
                         path to file with query to execute
-  --out_file OUT_FILE [OUT_FILE ...]
+  -o OUT_FILE [OUT_FILE ...], --out_file OUT_FILE [OUT_FILE ...]
                         file to write results to instead of printing to standard output
-  --out_file_format OUT_FILE_FORMAT
+  -F OUT_FILE_FORMAT, --out_file_format OUT_FILE_FORMAT
                         either csv or parquet, defaults to csv
-  --delimiter DELIMITER
+  -D DELIMITER, --delimiter DELIMITER
                         delimiter to use when printing result or writing to CSV file
   --config CONFIG       path to JSON config file
 ```

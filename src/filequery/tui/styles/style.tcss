@@ -1,0 +1,17 @@
+Screen {
+    layout: vertical;
+}
+
+.box {
+    height: 1fr;
+    border: ascii yellow;
+}
+
+.editor-area {
+    width: 3fr;
+}
+
+.browser-area {
+    width: 1fr;
+    border: solid green;
+}
