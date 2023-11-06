@@ -113,7 +113,7 @@ def validate_args(args: FileQueryArgs) -> str:
     if args.filename and args.filesdir:
         err_msg = "you cannot provide both filename and filesdir"
 
-    if not args.query and not args.query_file:
+    if not args.query and not args.query_file and not args.editor:
         err_msg = "you must provide either a query or a path to a file with a query"
 
     if args.query and args.query_file:
@@ -149,63 +149,67 @@ def run_sql(fdb: FileDb, queries: List[str]):
         yield query_result
 
 
-# determines what to do based on arguments provided
-# having this separate from fq_cli_handler() makes unit testing easier
-def handle_args(args: FileQueryArgs):
+def get_query_list(args: FileQueryArgs) -> List[str]:
     query = args.query
 
     if args.query_file:
-        try:
-            with open(args.query_file) as f:
-                query = "".join(f.readlines())
-        except:
-            print("error reading query file")
-            sys.exit()
+        with open(args.query_file) as f:
+            query = "".join(f.readlines())
 
+    return split_queries(query)
+
+
+# determines what to do based on arguments provided
+# having this separate from fq_cli_handler() makes unit testing easier
+def handle_args(args: FileQueryArgs):
     try:
         filepath = args.filename if args.filename else args.filesdir
         fdb = FileDb(filepath)
-
-        queries = split_queries(query)
-
-        if args.out_file:
-            if len(args.out_file) != len(queries):
-                print("number of queries and output files do not match")
-                sys.exit()
-
-            outfile_type = (
-                FileType.PARQUET if args.out_file_format == "parquet" else FileType.CSV
-            )
-
-            for i in range(len(queries)):
-                delimiter = args.delimiter if args.delimiter else ","
-                fdb.export_query(
-                    queries[i], args.out_file[i], outfile_type, delimiter=delimiter
-                )
-        else:
-            queries = split_queries(query)
-            for query_result in run_sql(fdb, queries):
-                query_result.format_as_table(args.delimiter)
     except Exception as e:
-        print("failed to query file")
+        print("failed to load files")
         print(e)
         sys.exit()
+
+    # if editor mode, run the editor and return afterwards
+    if args.editor:
+        ui = DuckUI(conn=fdb.db)
+        ui.run()
+        return
+
+    try:
+        queries = get_query_list(args)
+    except Exception as e:
+        print("failed to read query")
+        print(e)
+        sys.exit()
+
+    if args.out_file:
+        if len(args.out_file) != len(queries):
+            print("number of queries and output files do not match")
+            sys.exit()
+
+        outfile_type = (
+            FileType.PARQUET if args.out_file_format == "parquet" else FileType.CSV
+        )
+
+        for i in range(len(queries)):
+            delimiter = args.delimiter if args.delimiter else ","
+            fdb.export_query(
+                queries[i], args.out_file[i], outfile_type, delimiter=delimiter
+            )
+    else:
+        for query_result in run_sql(fdb, queries):
+            query_result.format_as_table(args.delimiter)
 
 
 def fq_cli_handler():
     parser = argparse.ArgumentParser()
     args = parse_arguments(parser)
+    err = validate_args(args)
 
-    # TODO: move this logic to handle_args. if editor specified, the only other argument is filename or filesdir
-    if args.editor:
-        ui = DuckUI()
-        ui.run()
-    else:
-        err = validate_args(args)
+    if err:
+        print(f"{err}\n")
+        parser.print_help()
+        sys.exit()
 
-        if err:
-            print(f"{err}\n")
-            parser.print_help()
-            sys.exit()
-
-        handle_args(args)
+    handle_args(args)
