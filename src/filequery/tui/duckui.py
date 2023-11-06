@@ -1,8 +1,6 @@
 from typing import Any, Coroutine
 
 import duckdb
-
-# from editor import SQLEditor
 from textual import events
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
@@ -26,6 +24,10 @@ class DuckUI(App):
     BINDINGS = [("f9", "execute_query", "Execute query")]
     CSS_PATH = "./styles/style.tcss"
 
+    def __init__(self, msg: str = "test"):
+        self.msg = msg
+        super().__init__()
+
     def on_mount(self):
         self.conn = duckdb.connect(":memory:")
         self.cur = self.conn.cursor()
@@ -36,7 +38,7 @@ class DuckUI(App):
 
         yield Horizontal(
             Vertical(
-                Static("one"),
+                Static(self.msg),
                 classes="browser-area",
             ),
             Vertical(
@@ -63,20 +65,10 @@ class DuckUI(App):
             self.result_table.add_columns(*col_names)
             self.result_table.add_rows(result)
         except:
+            # ignore this for now
             pass
-        # self.result_table.add_columns(*ROWS[0])
-        # self.result_table.add_rows(ROWS[1:])
-        # if result is not None:
-        #     try:
-        #         self.result_table.clear()
-        #         # self.result_table.add_rows(result)
-        #         self.table.add_columns(*ROWS[0])
-        #         self.table.add_rows(ROWS[1:])
-        #     except:
-        #         # just skip this for now
-        #         pass
 
 
 if __name__ == "__main__":
-    app = DuckUI()
+    app = DuckUI("hello")
     app.run()

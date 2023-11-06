@@ -5,6 +5,7 @@ from typing import List
 
 from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
+from filequery.tui.duckui import DuckUI
 
 
 def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
@@ -42,7 +43,16 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
         required=False,
         help="delimiter to use when printing result or writing to CSV file",
     )
-    parser.add_argument("--config", required=False, help="path to JSON config file")
+    parser.add_argument(
+        "-c", "--config", required=False, help="path to JSON config file"
+    )
+    parser.add_argument(
+        "-e",
+        "--editor",
+        required=False,
+        help="run SQL editor UI for exploring data",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     cli_args = None
@@ -63,6 +73,7 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
             args.out_file,
             args.out_file_format,
             args.delimiter,
+            args.editor,
         )
 
     return cli_args
@@ -80,13 +91,14 @@ def parse_config_file(config_file: str):
             outfiles = [config.get("out_file")]
 
         args = FileQueryArgs(
-            config.get("filename"),
-            config.get("filesdir"),
-            config.get("query"),
-            config.get("query_file"),
-            outfiles,
-            config.get("out_file_format"),
-            config.get("delimiter"),
+            filename=config.get("filename"),
+            filesdir=config.get("filesdir"),
+            query=config.get("query"),
+            query_file=config.get("query_file"),
+            out_file=outfiles,
+            out_file_format=config.get("out_file_format"),
+            delimiter=config.get("delimiter"),
+            editor=False,
         )
 
     return args
@@ -184,11 +196,16 @@ def fq_cli_handler():
     parser = argparse.ArgumentParser()
     args = parse_arguments(parser)
 
-    err = validate_args(args)
+    # TODO: move this logic to handle_args. if editor specified, the only other argument is filename or filesdir
+    if args.editor:
+        ui = DuckUI()
+        ui.run()
+    else:
+        err = validate_args(args)
 
-    if err:
-        print(f"{err}\n")
-        parser.print_help()
-        sys.exit()
+        if err:
+            print(f"{err}\n")
+            parser.print_help()
+            sys.exit()
 
-    handle_args(args)
+        handle_args(args)
