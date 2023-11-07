@@ -34,7 +34,7 @@ class DuckUI(App):
         super().__init__()
 
     def compose(self) -> ComposeResult:
-        self.text_area = TextArea(language="sql", classes="editor-box", theme="monokai")
+        self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula")
         self.text_area.focus(True)
         self.result_table = DataTable(classes="result-box")
         self.help_box = Markdown(help_md, classes="popup-box")
@@ -60,6 +60,8 @@ class DuckUI(App):
         self.help_box.visible = not self.help_box.visible
 
     def action_execute_query(self):
+        # TODO only execute query at the cursor, a nice touch would be to highlight the query that ran
+
         queries = self.text_area.text.split(";")
         result = None
         cur = self.conn.cursor()

@@ -8,6 +8,8 @@ numpy==1.24.2
 Pygments==2.16.1
 rich==13.6.0
 textual==0.41.0
+tree-sitter==0.20.2
+tree-sitter-languages==1.8.0
 typing_extensions==4.8.0
 uc-micro-py==1.0.2
 zipp==3.17.0
