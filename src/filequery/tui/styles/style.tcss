@@ -2,9 +2,14 @@ Screen {
     layout: vertical;
 }
 
-.box {
+.editor-box {
     height: 1fr;
     border: ascii yellow;
+}
+
+.result-box {
+    height: 1fr;
+    border: round green;
 }
 
 .editor-area {
@@ -13,5 +18,22 @@ Screen {
 
 .browser-area {
     width: 1fr;
-    border: solid green;
+    border: round green;
+}
+
+.title {
+    text-style: bold underline;
+    padding-bottom: 1;
+}
+
+.popup-box {
+    layer: above;
+    margin-left: 20;
+    margin-right: 20;
+    margin-top: 5;
+    height: 75%;
+    border: solid rgb(101, 6, 165);
+    overflow-x: scroll;
+    overflow-y: scroll;
+    visibility: hidden;
 }

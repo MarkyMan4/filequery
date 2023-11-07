@@ -1,14 +1,17 @@
-from typing import Any, Coroutine
-
 import duckdb
-from textual import events
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
-from textual.widgets import DataTable, Footer, Static, TextArea
+from textual.widgets import DataTable, Footer, Markdown, Static, TextArea
+
+from .help_content import help_md
 
 
 class DuckUI(App):
-    BINDINGS = [("f9", "execute_query", "Execute query")]
+    BINDINGS = [
+        Binding(key="f2", action="toggle_help", description="help"),
+        Binding(key="f9", action="execute_query", description="execute query"),
+    ]
     CSS_PATH = "./styles/style.tcss"
 
     def __init__(self, conn: duckdb.DuckDBPyConnection = None):
@@ -19,7 +22,7 @@ class DuckUI(App):
 
         # get the list of tables in the database to display them
         cur = self.conn.cursor()
-        self.tables = "tables\n----------\n"
+        self.tables = ""
         cur.execute("show all tables")
 
         for rec in cur.fetchall():
@@ -31,12 +34,14 @@ class DuckUI(App):
         super().__init__()
 
     def compose(self) -> ComposeResult:
-        self.text_area = TextArea(language="sql", classes="box", theme="dracula")
-        self.result_table = DataTable(classes="box")
+        self.text_area = TextArea(language="sql", classes="editor-box", theme="monokai")
+        self.text_area.focus(True)
+        self.result_table = DataTable(classes="result-box")
+        self.help_box = Markdown(help_md, classes="popup-box")
 
         yield Horizontal(
             Vertical(
-                # TODO make a custom class extending static, and make the content reactive
+                Static("tables", classes="title"),
                 Static(self.tables),
                 classes="browser-area",
             ),
@@ -47,34 +52,39 @@ class DuckUI(App):
             ),
         )
 
+        yield self.help_box
+
         yield Footer()
+
+    def action_toggle_help(self):
+        self.help_box.visible = not self.help_box.visible
 
     def action_execute_query(self):
         queries = self.text_area.text.split(";")
         result = None
         cur = self.conn.cursor()
 
+        def display_error_in_table(error: Exception):
+            self.result_table.clear(columns=True)
+            self.result_table.add_column("error")
+            self.result_table.add_row(error)
+
         for query in queries:
             if query.strip() != "":
                 try:
                     cur.execute(query)
                     result = cur.fetchall()
-                except:
-                    # TODO display an error message on screen
-                    pass
+                except Exception as e:
+                    display_error_in_table(e)
+                    cur.close()
+                    return
 
         try:
             col_names = [col[0] for col in cur.description]
             self.result_table.clear(columns=True)
             self.result_table.add_columns(*col_names)
             self.result_table.add_rows(result)
-        except:
-            # ignore errors for now
-            pass
+        except Exception as e:
+            display_error_in_table(e)
         finally:
             cur.close()
-
-
-if __name__ == "__main__":
-    app = DuckUI("hello")
-    app.run()
