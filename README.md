@@ -20,7 +20,7 @@ pip install filequery
 Run `filequery --help` to see what options are available.
 
 ```
-usage: filequery [-h] [-f FILENAME] [-d FILESDIR] [-q QUERY] [-Q QUERY_FILE] [-o OUT_FILE [OUT_FILE ...]] [-F OUT_FILE_FORMAT] [-D DELIMITER] [--config CONFIG]
+usage: filequery [-h] [-f FILENAME] [-d FILESDIR] [-q QUERY] [-Q QUERY_FILE] [-o OUT_FILE [OUT_FILE ...]] [-F OUT_FILE_FORMAT] [-D DELIMITER] [-c CONFIG] [-e]
 
 options:
   -h, --help            show this help message and exit
@@ -38,7 +38,9 @@ options:
                         either csv or parquet, defaults to csv
   -D DELIMITER, --delimiter DELIMITER
                         delimiter to use when printing result or writing to CSV file
-  --config CONFIG       path to JSON config file
+  -c CONFIG, --config CONFIG
+                        path to JSON config file
+  -e, --editor          run SQL editor UI for exploring data
 ```
 
 For basic usage, provide a path to a CSV or Parquet file and a query to execute against it. The table name will be the 
@@ -51,7 +53,7 @@ filequery --filename example/test.csv --query 'select * from test'
 Examples
 
 ```bash
-filequery --filename example/json_test.json --query 'select nested.nest_id, nested.nested_val from json_test' # query json
+filequery --filename example/json_test.json --query 'select nested.nest_id, nested.nest_val from json_test' # query json
 ```
 ```bash
 filequery --filesdir example/data --query 'select * from test inner join test1 on test.col1 = test1.col1' # query multiple files in a directory
