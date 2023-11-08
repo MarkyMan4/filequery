@@ -16,6 +16,8 @@ class DuckUI(App):
     BINDINGS = [
         Binding(key="f2", action="toggle_help", description="help"),
         Binding(key="f9", action="execute_query", description="execute query"),
+        Binding(key="ctrl+q", action="save_editor", description="save editor content"),
+        Binding(key="ctrl+r", action="save_result", description="save result"),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -42,12 +44,15 @@ class DuckUI(App):
         self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula")
         self.text_area.focus(True)
         self.result_table = DataTable(classes="result-box")
+        self.result_table.zebra_stripes = True
         self.help_box = Markdown(help_md, classes="popup-box")
 
         yield Horizontal(
             Vertical(
                 Static("tables", classes="title"),
-                Static(self.tables),
+                Static(
+                    self.tables
+                ),  # TODO make this a custom component with content being reactive
                 classes="browser-area",
             ),
             Vertical(
@@ -89,7 +94,12 @@ class DuckUI(App):
                  can be used to highlight the query
         :rtype: Tuple[str, Selection]
         """
+        # TODO remove comments from text_area.text (can probably do this with regex)
         queries = self.text_area.text.split(";")
+
+        # add character to the end of each query so that query is selected if cursor
+        # is right before semicolon
+        queries = [q + " " for q in queries]
 
         line = 0
         col = 0
@@ -164,3 +174,23 @@ class DuckUI(App):
             self._display_error_in_table(str(e))
         finally:
             cur.close()
+
+    # TODO need popup to enter names of files to save
+    def action_save_editor(self):
+        with open("filequery.sql", "w") as f:
+            f.write(self.text_area.text)
+
+    def action_save_result(self):
+        with open("result.csv", "w") as f:
+            cols = self.result_table.columns
+            rows = self.result_table._data
+
+            formatted_cols = [f'"{cols[col].label}"' for col in cols]
+            f.write(",".join(formatted_cols))
+            f.write("\n")
+
+            for row in rows:
+                row_data = rows[row]
+                formatted_row = [f'"{row_data[col]}"' for col in row_data]
+                f.write(",".join(formatted_row))
+                f.write("\n")

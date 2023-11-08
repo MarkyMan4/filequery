@@ -8,6 +8,8 @@ controls
 |ctrl+c|quit|
 |f2|toggle help screen|
 |f9|execute SQL in the editor|
+|ctrl+q|save editor content|
+|ctrl+r|save result|
 
 ---
 
