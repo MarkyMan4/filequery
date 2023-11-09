@@ -45,4 +45,11 @@ editor controls
 |ctrl+k|delete from cursor to the end of the line|
 |f6|select the current line|
 |f7|select all text in the document|
+
+helpful SQL statements
+
+```sql
+show tables; # list tables in the database
+describe table <table name>; # get information about the columns in a table
+```
 """

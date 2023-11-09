@@ -1,12 +1,12 @@
-# TODO add option to save queries and result to files
-
-from typing import Tuple
+import re
+from typing import Any, Coroutine, Tuple
 
 import duckdb
+from textual import events, on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
-from textual.widgets import DataTable, Footer, Markdown, Static, TextArea
+from textual.widgets import DataTable, Footer, Input, Markdown, Rule, Static, TextArea
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
@@ -16,8 +16,11 @@ class DuckUI(App):
     BINDINGS = [
         Binding(key="f2", action="toggle_help", description="help"),
         Binding(key="f9", action="execute_query", description="execute query"),
-        Binding(key="ctrl+q", action="save_editor", description="save editor content"),
+        Binding(key="ctrl+q", action="save_sql", description="save SQL"),
         Binding(key="ctrl+r", action="save_result", description="save result"),
+        Binding(
+            key="ctrl+p", action="close_all_popups", description="close all popups"
+        ),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -42,14 +45,25 @@ class DuckUI(App):
 
     def compose(self) -> ComposeResult:
         self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula")
-        self.text_area.focus(True)
+        self.text_area.focus()
         self.result_table = DataTable(classes="result-box")
         self.result_table.zebra_stripes = True
         self.help_box = Markdown(help_md, classes="popup-box")
+        self.save_sql_input = Input(
+            placeholder="sql file name...",
+            classes="file-name-input",
+            id="sql-file-input",
+        )
+        self.save_result_input = Input(
+            placeholder="result file name...",
+            classes="file-name-input",
+            id="result-file-input",
+        )
 
         yield Horizontal(
             Vertical(
                 Static("tables", classes="title"),
+                Rule(),
                 Static(
                     self.tables
                 ),  # TODO make this a custom component with content being reactive
@@ -63,11 +77,65 @@ class DuckUI(App):
         )
 
         yield self.help_box
+        yield self.save_sql_input
+        yield self.save_result_input
 
         yield Footer()
 
+    @on(Input.Submitted, selector="#sql-file-input")
+    def handle_sql_file_name_input(self):
+        try:
+            with open(self.save_sql_input.value, "w") as f:
+                f.write(self.text_area.text)
+        except:
+            # ignore for now, find a way to display an error message
+            pass
+
+        # after submit, hide this dialog and refocus on text editor
+        self.save_sql_input.display = False
+        self.text_area.focus()
+
+    @on(Input.Submitted, selector="#result-file-input")
+    def handle_result_file_name_input(self):
+        try:
+            with open(self.save_result_input.value, "w") as f:
+                cols = self.result_table.columns
+                rows = self.result_table._data
+
+                formatted_cols = [f'"{cols[col].label}"' for col in cols]
+                f.write(",".join(formatted_cols))
+                f.write("\n")
+
+                for row in rows:
+                    row_data = rows[row]
+                    formatted_row = [f'"{row_data[col]}"' for col in row_data]
+                    f.write(",".join(formatted_row))
+                    f.write("\n")
+        except:
+            # ignore for now, find a way to display an error message
+            pass
+
+        # after submit, hide this dialog and refocus on text editor
+        self.save_result_input.display = False
+        self.text_area.focus()
+
+    def action_close_all_popups(self):
+        # close help and file name inputs and refocus on editor
+        self.help_box.display = False
+        self.save_sql_input.display = False
+        self.save_result_input.display = False
+        self.text_area.focus()
+
+    def action_save_sql(self):
+        self.save_sql_input.display = True
+        self.save_sql_input.focus()
+
+    def action_save_result(self):
+        self.save_result_input.display = True
+        self.save_result_input.focus()
+
     def action_toggle_help(self):
-        self.help_box.visible = not self.help_box.visible
+        self.help_box.display = not self.help_box.display
 
     def _display_error_in_table(self, error_msg: str):
         """
@@ -94,8 +162,9 @@ class DuckUI(App):
                  can be used to highlight the query
         :rtype: Tuple[str, Selection]
         """
-        # TODO remove comments from text_area.text (can probably do this with regex)
-        queries = self.text_area.text.split(";")
+        # remove comments
+        text = re.sub("--.+", "", self.text_area.text)
+        queries = text.split(";")
 
         # add character to the end of each query so that query is selected if cursor
         # is right before semicolon
@@ -174,23 +243,3 @@ class DuckUI(App):
             self._display_error_in_table(str(e))
         finally:
             cur.close()
-
-    # TODO need popup to enter names of files to save
-    def action_save_editor(self):
-        with open("filequery.sql", "w") as f:
-            f.write(self.text_area.text)
-
-    def action_save_result(self):
-        with open("result.csv", "w") as f:
-            cols = self.result_table.columns
-            rows = self.result_table._data
-
-            formatted_cols = [f'"{cols[col].label}"' for col in cols]
-            f.write(",".join(formatted_cols))
-            f.write("\n")
-
-            for row in rows:
-                row_data = rows[row]
-                formatted_row = [f'"{row_data[col]}"' for col in row_data]
-                f.write(",".join(formatted_row))
-                f.write("\n")
