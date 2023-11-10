@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
+
 @dataclass
 class FileQueryArgs:
     filename: str
@@ -10,3 +11,4 @@ class FileQueryArgs:
     out_file: List[str]
     out_file_format: str
     delimiter: str
+    editor: bool

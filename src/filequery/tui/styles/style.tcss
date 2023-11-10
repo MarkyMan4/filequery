@@ -1,0 +1,48 @@
+Screen {
+    layout: vertical;
+    layers: below above top;
+}
+
+.editor-box {
+    height: 1fr;
+    border: ascii yellow;
+}
+
+.result-box {
+    height: 1fr;
+    border: round green;
+}
+
+.editor-area {
+    width: 3fr;
+}
+
+.browser-area {
+    width: 1fr;
+    border: round green;
+}
+
+.title {
+    text-style: bold;
+}
+
+.popup-box {
+    layer: top;
+    margin-left: 20;
+    margin-right: 20;
+    margin-top: 5;
+    height: 75%;
+    border: solid rgb(101, 6, 165);
+    overflow-y: scroll;
+    display: none;
+    padding: 1;
+}
+
+.file-name-input {
+    layer: above;
+    margin-left: 20;
+    margin-right: 20;
+    margin-top: 5;
+    border: solid rgb(101, 6, 165);
+    display: none;
+}

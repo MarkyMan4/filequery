@@ -1,3 +1,15 @@
-duckdb==0.8.1
+duckdb==0.9.1
+importlib-metadata==6.8.0
+linkify-it-py==2.0.2
+markdown-it-py==3.0.0
+mdit-py-plugins==0.4.0
+mdurl==0.1.2
 numpy==1.24.2
-tabulate==0.9.0
+Pygments==2.16.1
+rich==13.6.0
+textual==0.41.0
+tree-sitter==0.20.2
+tree-sitter-languages==1.8.0
+typing_extensions==4.8.0
+uc-micro-py==1.0.2
+zipp==3.17.0
