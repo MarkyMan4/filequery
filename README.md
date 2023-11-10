@@ -1,10 +1,17 @@
 # filequery
 Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
 
-## demo
+## Demo
+
+### CLI
+
 ![out](https://github.com/MarkyMan4/filequery/assets/37815834/38b6f69b-297f-4913-826e-89ffbfe483b3)
 
-## installation
+### TUI
+
+![filequery_tui](https://github.com/MarkyMan4/filequery/assets/37815834/56ac5f6f-a8f1-4bcd-9f7f-0721372592d8)
+
+## Installation
 
 ```bash
 pipx install filequery
@@ -50,7 +57,21 @@ file name without the extension.
 filequery --filename example/test.csv --query 'select * from test'
 ```
 
-Examples
+## TUI usage
+
+To use the TUI for querying your files, use the `-e` flag and provide a path to a file or directory.
+
+```bash
+filequery -e -f path/to/file.csv
+```
+
+or
+
+```bash
+filequery -e -f path/to/file_directory
+```
+
+## Examples
 
 ```bash
 filequery --filename example/json_test.json --query 'select nested.nest_id, nested.nest_val from json_test' # query json
@@ -98,7 +119,7 @@ The config file should be a json file. See example config file contents below.
 
 See the `example` directory in the repo for more examples.
 
-## module usage
+## Module usage
 You can also use filequery in your own programs. See the example below.
 
 ```python
@@ -122,7 +143,7 @@ res.save_to_file('result.csv')
 fdb.export_query(query, 'result.parquet', FileType.PARQUET)
 ```
 
-## development
+## Development
 Packages required for distribution should go in `requirements.txt`.
 
 To build the wheel:
@@ -132,11 +153,13 @@ pip install -r requirements-dev.txt
 make
 ```
 
-## testing
-To test the CLI, cd into the `src` directory and run `filequery` as a module.
+## Testing
+To test the CLI, create a separate virtual environment perform an editable.
 
 ```bash
-python -m filequery ...
+python -m venv test-env
+. test-env/bin/activate
+pip install -e .
 ```
 
 To run unit tests, stay in the root of the project. The unit tests add `src` to the path so `filequery` can be imported properly.
