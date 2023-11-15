@@ -16,7 +16,7 @@ markdown-it-py==3.0.0
 mdit-py-plugins==0.4.0
 mdurl==0.1.2
 more-itertools==9.0.0
-numpy==1.24.2
+numpy==1.26.1
 packaging==23.0
 pkginfo==1.9.6
 pycparser==2.21

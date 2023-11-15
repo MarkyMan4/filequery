@@ -7,10 +7,10 @@ name = "filequery"
 authors = [{ name = "Markus Hutnik", email = "markus@markushutnik.com" }]
 description = "Query CSV and Parquet files using SQL"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = ["Programming Language :: Python :: 3"]
 license = { text = "MIT" }
-version = "0.2.0"
+version = "0.2.1"
 dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
