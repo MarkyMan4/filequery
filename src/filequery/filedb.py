@@ -45,9 +45,16 @@ class FileDb:
             table_name = os.path.splitext(base_filename)[0]
             read_func = READ_FUNCS[filetype]
 
-            self.db.execute(
-                f"create table {table_name} as select * from {read_func}('{filename}');"
-            )
+            # for csv, json and ndjson, set sample size to -1 (sample all records)
+            # this is not needed for parquet
+            if filetype == FileType.PARQUET:
+                self.db.execute(
+                    f"create table {table_name} as select * from {read_func}('{filename}');"
+                )
+            else:
+                self.db.execute(
+                    f"create table {table_name} as select * from {read_func}('{filename}', SAMPLE_SIZE=-1);"
+                )
 
         if os.path.isdir(filepath):
             # only take accepted file types
