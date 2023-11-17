@@ -1,15 +1,17 @@
 import re
-from typing import Any, Coroutine, Tuple
+from typing import List, Tuple
 
 import duckdb
 from textual import events, on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
-from textual.widgets import DataTable, Footer, Input, Markdown, Rule, Static, TextArea
+from textual.widgets import (DataTable, Footer, Input, Markdown, Rule, Static,
+                             TextArea)
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
+from .widgets.reactive_list import ReactiveList
 
 
 class DuckUI(App):
@@ -32,22 +34,46 @@ class DuckUI(App):
 
         # get the list of tables in the database to display them
         cur = self.conn.cursor()
-        self.tables = ""
+        self.tables = []
         cur.execute("show all tables")
 
         for rec in cur.fetchall():
-            self.tables += rec[2]  # third column is table name
+            self.tables.append(rec[2])  # third column is table name
             self.tables += "\n"
 
         cur.close()
 
         super().__init__()
 
+    def _get_table_list(self) -> List[str]:
+        """
+        get the list of tables in the database
+
+        :return: list of tables currently in the database
+        :rtype: List[str]
+        """
+        cur = self.conn.cursor()
+        tables = []
+        cur.execute("show all tables")
+
+        for rec in cur.fetchall():
+            tables.append(rec[2])  # third column is table name
+
+        cur.close()
+
+        return tables
+        
+
     def compose(self) -> ComposeResult:
+        self.table_list = ReactiveList()
+        self.table_list.items = self._get_table_list()
+
         self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula")
         self.text_area.focus()
+
         self.result_table = DataTable(classes="result-box")
         self.result_table.zebra_stripes = True
+
         self.help_box = Markdown(help_md, classes="popup-box")
         self.save_sql_input = Input(
             placeholder="sql file name...",
@@ -64,9 +90,7 @@ class DuckUI(App):
             Vertical(
                 Static("tables", classes="title"),
                 Rule(),
-                Static(
-                    self.tables
-                ),  # TODO make this a custom component with content being reactive
+                self.table_list,
                 classes="browser-area",
             ),
             Vertical(
@@ -243,3 +267,8 @@ class DuckUI(App):
             self._display_error_in_table(str(e))
         finally:
             cur.close()
+            cur.close()
+            cur.close()
+
+        # after executing a statement, update the table list in case any tables were created or dropped
+        self.table_list.items = self._get_table_list()
