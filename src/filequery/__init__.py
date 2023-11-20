@@ -3,6 +3,8 @@ import json
 import sys
 from typing import List
 
+import duckdb
+
 from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
 from filequery.tui.duckui import DuckUI
@@ -107,6 +109,10 @@ def parse_config_file(config_file: str):
 def validate_args(args: FileQueryArgs) -> str:
     err_msg = None
 
+    # if using editor, other args are optional
+    if args.editor:
+        return err_msg
+
     if not args.filename and not args.filesdir:
         err_msg = "you must provide either a file name or a path to a directory containing CSV and/or Parquet files"
 
@@ -162,6 +168,12 @@ def get_query_list(args: FileQueryArgs) -> List[str]:
 # determines what to do based on arguments provided
 # having this separate from fq_cli_handler() makes unit testing easier
 def handle_args(args: FileQueryArgs):
+    # if using editor and no files specified, run DuckUI with an empty database
+    if args.editor and not args.filename and not args.filesdir:
+        ui = DuckUI(conn=duckdb.connect(":memory:"))
+        ui.run()
+        return
+
     try:
         filepath = args.filename if args.filename else args.filesdir
         fdb = FileDb(filepath)
