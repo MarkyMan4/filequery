@@ -4,6 +4,7 @@ import sys
 from typing import List
 
 import duckdb
+import importlib_metadata
 
 from filequery.file_query_args import FileQueryArgs
 from filequery.filedb import FileDb, FileType
@@ -54,6 +55,12 @@ def parse_arguments(parser: argparse.ArgumentParser) -> FileQueryArgs:
         required=False,
         help="run SQL editor UI for exploring data",
         action="store_true",
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=importlib_metadata.version("filequery")
     )
     args = parser.parse_args()
 
