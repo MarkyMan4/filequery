@@ -27,7 +27,7 @@ pip install filequery
 Run `filequery --help` to see what options are available.
 
 ```
-usage: filequery [-h] [-f FILENAME] [-d FILESDIR] [-q QUERY] [-Q QUERY_FILE] [-o OUT_FILE [OUT_FILE ...]] [-F OUT_FILE_FORMAT] [-D DELIMITER] [-c CONFIG] [-e]
+usage: filequery [-h] [-f FILENAME] [-d FILESDIR] [-q QUERY] [-Q QUERY_FILE] [-o OUT_FILE [OUT_FILE ...]] [-F OUT_FILE_FORMAT] [-D DELIMITER] [-c CONFIG] [-e] [-v]
 
 options:
   -h, --help            show this help message and exit
@@ -48,6 +48,7 @@ options:
   -c CONFIG, --config CONFIG
                         path to JSON config file
   -e, --editor          run SQL editor UI for exploring data
+  -v, --version         show program's version number and exit
 ```
 
 For basic usage, provide a path to a CSV or Parquet file and a query to execute against it. The table name will be the 
