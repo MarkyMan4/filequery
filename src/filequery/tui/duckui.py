@@ -21,7 +21,7 @@ class DuckUI(App):
         Binding(key="ctrl+q", action="save_sql", description="save SQL"),
         Binding(key="ctrl+r", action="save_result", description="save result"),
         Binding(
-            key="ctrl+p", action="close_all_popups", description="close all popups"
+            key="ctrl+p", action="close_dialog", description="close dialog"
         ),
     ]
     CSS_PATH = "./styles/style.tcss"
@@ -143,7 +143,7 @@ class DuckUI(App):
         self.save_result_input.display = False
         self.text_area.focus()
 
-    def action_close_all_popups(self):
+    def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
         self.help_box.display = False
         self.save_sql_input.display = False
