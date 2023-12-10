@@ -1,6 +1,8 @@
 # filequery
 Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/markushutnik)
+
 ## Demo
 
 ### CLI
