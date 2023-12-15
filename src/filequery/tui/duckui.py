@@ -71,7 +71,9 @@ class DuckUI(App):
         self.table_list = ReactiveList()
         self.table_list.items = self._get_table_list()
 
-        self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula", id="editor")
+        self.text_area = TextArea(
+            language="sql", classes="editor-box", theme="dracula", id="editor"
+        )
         self.text_area.focus()
 
         self.result_table = DataTable(classes="result-box")
@@ -159,6 +161,19 @@ class DuckUI(App):
         self.text_area.text = self.tab_content[event.tab.id]
         self.result_table.clear(columns=True)
 
+    # handle key events outside of bindings
+    async def on_key(self, event: events.Key):
+        if event.key == "ctrl+shift+up":
+            if self.text_area.has_focus:
+                self.tabs.focus()
+            elif self.result_table.has_focus:
+                self.text_area.focus()
+        elif event.key == "ctrl+shift+down":
+            if self.tabs.has_focus:
+                self.text_area.focus()
+            elif self.text_area.has_focus:
+                self.result_table.focus()
+
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
         self.help_box.display = False
@@ -178,13 +193,18 @@ class DuckUI(App):
         self.help_box.display = not self.help_box.display
 
     async def action_new_tab(self):
-        # TODO make tab add to the max tab ID found in tab_content
-        await self.tabs.add_tab(
-            f"tab {self.tabs.tab_count + 1}", after=self.tabs.active_tab
-        )
+        # find the max tab ID and add one to get the next tab ID
+        # tab IDs are tab-<id>, so split on "-" and take the second element to get the ID
+        tab_ids = [int(tab_id.split("-")[1]) for tab_id in self.tab_content.keys()]
+        next_id = max(tab_ids) + 1
+        await self.tabs.add_tab(f"tab {next_id}", after=self.tabs.active_tab)
         self.tabs.action_next_tab()
 
     async def action_close_tab(self):
+        # don't allow closing if only one tab open
+        if self.tabs.tab_count == 1:
+            return
+
         active_tab_id = self.tabs.active_tab.id
         await self.tabs.remove_tab(active_tab_id)
         del self.tab_content[active_tab_id]
