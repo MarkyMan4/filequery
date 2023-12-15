@@ -1,6 +1,14 @@
 # filequery
-Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
+[![pypi](https://img.shields.io/pypi/v/filequery.svg)](https://pypi.org/project/filequery/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/MarkyMan4/filequery)
 
+Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
+- runs queries using a DuckDB in-memory database for efficient querying
+- any SQL that works with DuckDB will work here
+- use the CLI to easily query files in your terminal or automate queries/transformations as part of a script
+- use the TUI for a more interactive experience
+
+\
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/markushutnik)
 
 ## Demo
