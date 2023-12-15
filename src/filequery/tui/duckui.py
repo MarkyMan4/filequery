@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from typing import List, Tuple
 
 import duckdb
@@ -7,7 +8,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import (DataTable, Footer, Input, Markdown, Rule, Static,
-                             TextArea)
+                             Tab, Tabs, TextArea)
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
@@ -20,9 +21,9 @@ class DuckUI(App):
         Binding(key="f9", action="execute_query", description="execute query"),
         Binding(key="ctrl+q", action="save_sql", description="save SQL"),
         Binding(key="ctrl+r", action="save_result", description="save result"),
-        Binding(
-            key="ctrl+p", action="close_dialog", description="close dialog"
-        ),
+        Binding(key="ctrl+p", action="close_dialog", description="close dialog"),
+        Binding(key="ctrl+n", action="new_tab", description="new tab"),
+        Binding(key="ctrl+t", action="close_tab", description="close tab"),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -43,6 +44,9 @@ class DuckUI(App):
 
         cur.close()
 
+        # mapping from tab ID to editor content, tab IDs are "tab-1", "tab-2" and so on
+        self.tab_content = defaultdict(str)
+
         super().__init__()
 
     def _get_table_list(self) -> List[str]:
@@ -62,13 +66,14 @@ class DuckUI(App):
         cur.close()
 
         return tables
-        
 
     def compose(self) -> ComposeResult:
         self.table_list = ReactiveList()
         self.table_list.items = self._get_table_list()
 
-        self.text_area = TextArea(language="sql", classes="editor-box", theme="dracula")
+        self.text_area = TextArea(
+            language="sql", classes="editor-box", theme="dracula", id="editor"
+        )
         self.text_area.focus()
 
         self.result_table = DataTable(classes="result-box")
@@ -86,6 +91,8 @@ class DuckUI(App):
             id="result-file-input",
         )
 
+        self.tabs = Tabs(Tab("tab 1"))
+
         yield Horizontal(
             Vertical(
                 Static("tables", classes="title"),
@@ -94,6 +101,7 @@ class DuckUI(App):
                 classes="browser-area",
             ),
             Vertical(
+                self.tabs,
                 self.text_area,
                 self.result_table,
                 classes="editor-area",
@@ -143,6 +151,43 @@ class DuckUI(App):
         self.save_result_input.display = False
         self.text_area.focus()
 
+    @on(TextArea.Changed, selector="#editor")
+    def handle_editor_content_changed(self):
+        cur_tab = self.tabs.active_tab.id
+        self.tab_content[cur_tab] = self.text_area.text
+
+    @on(Tabs.TabActivated)
+    def handle_tab_activated(self, event: Tabs.TabActivated):
+        self.text_area.text = self.tab_content[event.tab.id]
+        self.result_table.clear(columns=True)
+
+    def on_descendant_focus(self, event: events.DescendantFocus):
+        if type(event.widget) == DataTable:
+            self.result_table.add_class("focused")
+            self.text_area.remove_class("focused")
+            self.tabs.remove_class("focused")
+        if type(event.widget) == TextArea:
+            self.text_area.add_class("focused")
+            self.result_table.remove_class("focused")
+            self.tabs.remove_class("focused")
+        if type(event.widget) == Tabs:
+            self.result_table.remove_class("focused")
+            self.text_area.remove_class("focused")
+
+    # handle key events outside of bindings
+    def on_key(self, event: events.Key):
+        if event.key == "ctrl+shift+up":
+            if self.text_area.has_focus:
+                self.tabs.focus()
+            elif self.result_table.has_focus:
+                self.text_area.focus()
+        elif event.key == "ctrl+shift+down":
+            if self.tabs.has_focus:
+                self.text_area.focus()
+            elif self.text_area.has_focus:
+                self.result_table = self.result_table.focus()
+                self.text_area = self.text_area.blur()
+
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
         self.help_box.display = False
@@ -160,6 +205,26 @@ class DuckUI(App):
 
     def action_toggle_help(self):
         self.help_box.display = not self.help_box.display
+
+    async def action_new_tab(self):
+        # find the max tab ID and add one to get the next tab ID
+        # tab IDs are tab-<id>, so split on "-" and take the second element to get the ID
+        tab_ids = [int(tab_id.split("-")[1]) for tab_id in self.tab_content.keys()]
+        next_id = max(tab_ids) + 1
+        await self.tabs.add_tab(
+            Tab(f"tab {next_id}", id=f"tab-{next_id}"), after=self.tabs.active_tab
+        )
+        self.tabs.action_next_tab()
+
+    async def action_close_tab(self):
+        # don't allow closing if only one tab open
+        if self.tabs.tab_count == 1:
+            return
+
+        active_tab_id = self.tabs.active_tab.id
+        await self.tabs.remove_tab(active_tab_id)
+        del self.tab_content[active_tab_id]
+        self.tabs.action_previous_tab()
 
     def _display_error_in_table(self, error_msg: str):
         """

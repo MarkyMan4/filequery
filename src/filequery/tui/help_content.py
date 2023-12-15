@@ -10,6 +10,10 @@ controls
 |f9|execute SQL in the editor|
 |ctrl+q|save editor content|
 |ctrl+r|save result|
+|ctrl+p|close all open dialogs (help screen, save file dialogs)|
+|ctrl+n|open a new tab|
+|ctrl+shift+<arrow key>|navigate panes|
+|left or right arrow|switch tabs (must have the tab section focused to use this, i.e. press `ctrl+shift+up` until the tab section at the top of the screen is focused)|
 
 ---
 
