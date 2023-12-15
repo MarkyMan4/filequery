@@ -5,7 +5,7 @@ Screen {
 
 .editor-box {
     height: 1fr;
-    border: ascii yellow;
+    border: round green;
 }
 
 .result-box {
@@ -13,8 +13,13 @@ Screen {
     border: round green;
 }
 
+.focused {
+    border: ascii yellow;
+}
+
 .editor-area {
     width: 3fr;
+    text-opacity: 50%;
 }
 
 .browser-area {

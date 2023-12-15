@@ -23,7 +23,7 @@ class DuckUI(App):
         Binding(key="ctrl+r", action="save_result", description="save result"),
         Binding(key="ctrl+p", action="close_dialog", description="close dialog"),
         Binding(key="ctrl+n", action="new_tab", description="new tab"),
-        Binding(key="ctrl+w", action="close_tab", description="close tab"),
+        Binding(key="ctrl+t", action="close_tab", description="close tab"),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -161,8 +161,21 @@ class DuckUI(App):
         self.text_area.text = self.tab_content[event.tab.id]
         self.result_table.clear(columns=True)
 
+    def on_descendant_focus(self, event: events.DescendantFocus):
+        if type(event.widget) == DataTable:
+            self.result_table.add_class("focused")
+            self.text_area.remove_class("focused")
+            self.tabs.remove_class("focused")
+        if type(event.widget) == TextArea:
+            self.text_area.add_class("focused")
+            self.result_table.remove_class("focused")
+            self.tabs.remove_class("focused")
+        if type(event.widget) == Tabs:
+            self.result_table.remove_class("focused")
+            self.text_area.remove_class("focused")
+
     # handle key events outside of bindings
-    async def on_key(self, event: events.Key):
+    def on_key(self, event: events.Key):
         if event.key == "ctrl+shift+up":
             if self.text_area.has_focus:
                 self.tabs.focus()
@@ -172,7 +185,8 @@ class DuckUI(App):
             if self.tabs.has_focus:
                 self.text_area.focus()
             elif self.text_area.has_focus:
-                self.result_table.focus()
+                self.result_table = self.result_table.focus()
+                self.text_area = self.text_area.blur()
 
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
@@ -197,7 +211,9 @@ class DuckUI(App):
         # tab IDs are tab-<id>, so split on "-" and take the second element to get the ID
         tab_ids = [int(tab_id.split("-")[1]) for tab_id in self.tab_content.keys()]
         next_id = max(tab_ids) + 1
-        await self.tabs.add_tab(f"tab {next_id}", after=self.tabs.active_tab)
+        await self.tabs.add_tab(
+            Tab(f"tab {next_id}", id=f"tab-{next_id}"), after=self.tabs.active_tab
+        )
         self.tabs.action_next_tab()
 
     async def action_close_tab(self):
@@ -208,6 +224,7 @@ class DuckUI(App):
         active_tab_id = self.tabs.active_tab.id
         await self.tabs.remove_tab(active_tab_id)
         del self.tab_content[active_tab_id]
+        self.tabs.action_previous_tab()
 
     def _display_error_in_table(self, error_msg: str):
         """

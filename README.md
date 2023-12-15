@@ -11,7 +11,7 @@ Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any
 
 ### TUI
 
-![filequery_tui](https://github.com/MarkyMan4/filequery/assets/37815834/56ac5f6f-a8f1-4bcd-9f7f-0721372592d8)
+![filequery_tui](https://github.com/MarkyMan4/filequery/assets/37815834/b88fc0d0-0e88-408b-849e-c681e7de0e13)
 
 ## Installation
 
