@@ -19,7 +19,6 @@ Screen {
 
 .editor-area {
     width: 3fr;
-    text-opacity: 50%;
 }
 
 .browser-area {
