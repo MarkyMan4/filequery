@@ -8,11 +8,10 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import (DataTable, Footer, Input, Markdown, Rule, Static,
-                             Tab, Tabs, TextArea)
+                             Tab, Tabs, TextArea, Tree)
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
-from .widgets.reactive_list import ReactiveList
 
 
 class DuckUI(App):
@@ -32,17 +31,6 @@ class DuckUI(App):
 
         if self.conn is None:
             self.conn = duckdb.connect(":memory:")
-
-        # get the list of tables in the database to display them
-        cur = self.conn.cursor()
-        self.tables = []
-        cur.execute("show all tables")
-
-        for rec in cur.fetchall():
-            self.tables.append(rec[2])  # third column is table name
-            self.tables += "\n"
-
-        cur.close()
 
         # mapping from tab ID to editor content, tab IDs are "tab-1", "tab-2" and so on
         self.tab_content = defaultdict(str)
@@ -67,9 +55,23 @@ class DuckUI(App):
 
         return tables
 
+    def _refresh_table_tree(self):
+        self.tables.root.remove_children()
+        cur = self.conn.cursor()
+
+        for table in self._get_table_list():
+            table_node = self.tables.root.add(table)
+            cur.execute(f"describe table {table}")
+
+            for rec in cur.fetchall():
+                table_node.add_leaf(f"{rec[0]}: {rec[1]}")
+
+        cur.close()
+
     def compose(self) -> ComposeResult:
-        self.table_list = ReactiveList()
-        self.table_list.items = self._get_table_list()
+        self.tables = Tree("tables", classes="table-browser-area")
+        self.tables.root.expand()
+        self._refresh_table_tree()
 
         self.text_area = TextArea(
             language="sql", classes="editor-box", theme="dracula", id="editor"
@@ -95,10 +97,7 @@ class DuckUI(App):
 
         yield Horizontal(
             Vertical(
-                Static("tables", classes="title"),
-                Rule(),
-                self.table_list,
-                classes="browser-area",
+                self.tables,
             ),
             Vertical(
                 self.tabs,
@@ -165,12 +164,17 @@ class DuckUI(App):
         if type(event.widget) == DataTable:
             self.result_table.add_class("focused")
             self.text_area.remove_class("focused")
-            self.tabs.remove_class("focused")
+            self.tables.remove_class("focused")
         if type(event.widget) == TextArea:
             self.text_area.add_class("focused")
             self.result_table.remove_class("focused")
-            self.tabs.remove_class("focused")
+            self.tables.remove_class("focused")
         if type(event.widget) == Tabs:
+            self.result_table.remove_class("focused")
+            self.text_area.remove_class("focused")
+            self.tables.remove_class("focused")
+        if type(event.widget) == Tree:
+            self.tables.add_class("focused")
             self.result_table.remove_class("focused")
             self.text_area.remove_class("focused")
 
@@ -185,8 +189,11 @@ class DuckUI(App):
             if self.tabs.has_focus:
                 self.text_area.focus()
             elif self.text_area.has_focus:
-                self.result_table = self.result_table.focus()
-                self.text_area = self.text_area.blur()
+                self.result_table.focus()
+        elif event.key == "ctrl+shift+left":
+            self.tables.focus()
+        elif event.key == "ctrl+shift+right":
+            self.text_area.focus()
 
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
@@ -336,4 +343,4 @@ class DuckUI(App):
             cur.close()
 
         # after executing a statement, update the table list in case any tables were created or dropped
-        self.table_list.items = self._get_table_list()
+        self._refresh_table_tree()
