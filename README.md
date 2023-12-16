@@ -2,7 +2,7 @@
 [![pypi](https://img.shields.io/pypi/v/filequery.svg)](https://pypi.org/project/filequery/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/MarkyMan4/filequery)
 
-Query CSV and Parquet files using SQL. This uses DuckDB behind the scenes so any valid SQL for DuckDB will work here.
+Query CSV and Parquet files using SQL.
 - runs queries using a DuckDB in-memory database for efficient querying
 - any SQL that works with DuckDB will work here
 - use the CLI to easily query files in your terminal or automate queries/transformations as part of a script
@@ -79,7 +79,14 @@ filequery -e -f path/to/file.csv
 or
 
 ```bash
-filequery -e -f path/to/file_directory
+filequery -e -d path/to/file_directory
+```
+
+You can also omit a path to a file or directory and open a blank editor. This can be helpful if 
+you want to directly use DuckDB functions such as `read_csv_auto()` for querying your files.
+
+```bash
+filequery -e
 ```
 
 ## Examples
