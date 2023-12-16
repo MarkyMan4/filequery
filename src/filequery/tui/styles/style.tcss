@@ -13,17 +13,17 @@ Screen {
     border: round green;
 }
 
-.focused {
-    border: ascii yellow;
-}
-
 .editor-area {
     width: 3fr;
 }
 
-.browser-area {
+.table-browser-area {
     width: 1fr;
     border: round green;
+}
+
+.focused {
+    border: ascii yellow;
 }
 
 .title {

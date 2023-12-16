@@ -50,6 +50,12 @@ editor controls
 |f6|select the current line|
 |f7|select all text in the document|
 
+---
+
+When you navigate to the table list on the left side, press `space` or `enter` to expand/collapse table columns.
+
+---
+
 helpful SQL statements
 
 ```sql

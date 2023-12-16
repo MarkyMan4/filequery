@@ -172,7 +172,7 @@ make
 ```
 
 ## Testing
-To test the CLI, create a separate virtual environment perform an editable.
+To test the CLI, create a separate virtual environment perform an editable install.
 
 ```bash
 python -m venv test-env
