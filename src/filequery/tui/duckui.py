@@ -7,8 +7,8 @@ from textual import events, on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
-from textual.widgets import (DataTable, Footer, Input, Markdown, Rule, Static,
-                             Tab, Tabs, TextArea, Tree)
+from textual.widgets import (DataTable, Footer, Input, Markdown, Tab, Tabs,
+                             TextArea, Tree)
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
