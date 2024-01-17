@@ -12,6 +12,7 @@ from textual.widgets import (DataTable, Footer, Input, Markdown, Tab, Tabs,
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
+from .screens.menu import MenuModel
 
 
 class DuckUI(App):
@@ -21,8 +22,6 @@ class DuckUI(App):
         Binding(key="ctrl+q", action="save_sql", description="save SQL"),
         Binding(key="ctrl+r", action="save_result", description="save result"),
         Binding(key="ctrl+p", action="close_dialog", description="close dialog"),
-        Binding(key="ctrl+n", action="new_tab", description="new tab"),
-        Binding(key="ctrl+t", action="close_tab", description="close tab"),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -36,6 +35,9 @@ class DuckUI(App):
         self.tab_content = defaultdict(str)
 
         super().__init__()
+
+    def key_f1(self):
+        self.push_screen(MenuModel())
 
     def _get_table_list(self) -> List[str]:
         """
@@ -179,7 +181,7 @@ class DuckUI(App):
             self.text_area.remove_class("focused")
 
     # handle key events outside of bindings
-    def on_key(self, event: events.Key):
+    async def on_key(self, event: events.Key):
         if event.key == "ctrl+shift+up":
             if self.text_area.has_focus:
                 self.tabs.focus()
@@ -194,6 +196,10 @@ class DuckUI(App):
             self.tables.focus()
         elif event.key == "ctrl+shift+right":
             self.text_area.focus()
+        elif event.key == "ctrl+n":
+            await self.action_new_tab()
+        elif event.key == "ctrl+t":
+            await self.action_close_tab()
 
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
