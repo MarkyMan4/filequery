@@ -13,14 +13,14 @@ from textual.widgets.text_area import Selection
 
 from .help_content import help_md
 from .screens.menu import MenuModal
+from .screens.menu_events import MenuEvent
 
 
 class DuckUI(App):
     BINDINGS = [
+        Binding(key="f1", action="toggle_menu", description="menu"),
         Binding(key="f2", action="toggle_help", description="help"),
         Binding(key="f9", action="execute_query", description="execute query"),
-        Binding(key="ctrl+q", action="save_sql", description="save SQL"),
-        Binding(key="ctrl+r", action="save_result", description="save result"),
         Binding(key="ctrl+p", action="close_dialog", description="close dialog"),
     ]
     CSS_PATH = "./styles/style.tcss"
@@ -35,9 +35,6 @@ class DuckUI(App):
         self.tab_content = defaultdict(str)
 
         super().__init__()
-
-    def key_f1(self):
-        self.push_screen(MenuModal())
 
     def _get_table_list(self) -> List[str]:
         """
@@ -201,20 +198,23 @@ class DuckUI(App):
         elif event.key == "ctrl+t":
             await self.action_close_tab()
 
+    def handle_menu_event(self,event: MenuEvent):
+        if event == MenuEvent.SAVE_SQL:
+            self.save_sql_input.display = True
+            self.save_sql_input.focus()
+        elif event == MenuEvent.SAVE_RESULT:
+            self.save_result_input.display = True
+            self.save_result_input.focus()
+
+    def action_toggle_menu(self):
+        self.push_screen(MenuModal(), callback=self.handle_menu_event)
+
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
         self.help_box.display = False
         self.save_sql_input.display = False
         self.save_result_input.display = False
         self.text_area.focus()
-
-    def action_save_sql(self):
-        self.save_sql_input.display = True
-        self.save_sql_input.focus()
-
-    def action_save_result(self):
-        self.save_result_input.display = True
-        self.save_result_input.focus()
 
     def action_toggle_help(self):
         self.help_box.display = not self.help_box.display
