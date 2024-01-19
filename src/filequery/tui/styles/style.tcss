@@ -50,3 +50,20 @@ Screen {
     border: solid rgb(101, 6, 165);
     display: none;
 }
+
+MenuModal {
+    align: center middle;
+}
+
+MenuModal > Container {
+    width: 50%;
+    height: 50%;
+    align: center middle;
+    padding: 1 2;
+    background: $panel;
+}
+
+MenuModal > Container > Vertical {
+    height: auto;
+    width: auto;
+}

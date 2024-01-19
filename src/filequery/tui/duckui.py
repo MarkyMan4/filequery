@@ -12,7 +12,7 @@ from textual.widgets import (DataTable, Footer, Input, Markdown, Tab, Tabs,
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
-from .screens.menu import MenuModel
+from .screens.menu import MenuModal
 
 
 class DuckUI(App):
@@ -37,7 +37,7 @@ class DuckUI(App):
         super().__init__()
 
     def key_f1(self):
-        self.push_screen(MenuModel())
+        self.push_screen(MenuModal())
 
     def _get_table_list(self) -> List[str]:
         """
