@@ -56,14 +56,39 @@ MenuModal {
 }
 
 MenuModal > Container {
-    width: 50%;
+    width: 40%;
     height: 50%;
     align: center middle;
     padding: 1 2;
     background: $panel;
+    border: solid green;
+    overflow-y: scroll;
 }
 
 MenuModal > Container > Vertical {
     height: auto;
     width: auto;
+}
+
+#menu-title {
+    text-align: center;
+    text-style: bold;
+}
+
+.menu-btn {
+    margin-top: 1;
+    border: ascii green;
+    text-style: none;
+}
+
+.menu-btn:hover {
+    border: ascii yellow;
+}
+
+.menu-btn:focus {
+    border: ascii yellow;
+}
+
+.menu-exit-btn:focus {
+    border: ascii red;
 }

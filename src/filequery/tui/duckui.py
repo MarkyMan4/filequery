@@ -205,6 +205,8 @@ class DuckUI(App):
         elif event == MenuEvent.SAVE_RESULT:
             self.save_result_input.display = True
             self.save_result_input.focus()
+        elif event == MenuEvent.EXIT:
+            self.exit()
 
     def action_toggle_menu(self):
         self.push_screen(MenuModal(), callback=self.handle_menu_event)

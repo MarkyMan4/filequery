@@ -8,9 +8,6 @@ Query CSV and Parquet files using SQL.
 - use the CLI to easily query files in your terminal or automate queries/transformations as part of a script
 - use the TUI for a more interactive experience
 
-\
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/markushutnik)
-
 ## Demo
 
 ### CLI
