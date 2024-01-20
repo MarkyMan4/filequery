@@ -55,15 +55,28 @@ class DuckUI(App):
         return tables
 
     def _refresh_table_tree(self):
+        # refreshing causes the tree to get recreated, which makes all nodes collapsed
+        # keep track of what is expanded right now and expand them again after recreation
+        nodes_to_expand = []
+
+        for child in self.tables.root.children:
+            if child.is_expanded:
+                nodes_to_expand.append(str(child.label))
+
         self.tables.root.remove_children()
         cur = self.conn.cursor()
 
         for table in self._get_table_list():
             table_node = self.tables.root.add(table)
+            
             cur.execute(f"describe table {table}")
 
             for rec in cur.fetchall():
                 table_node.add_leaf(f"{rec[0]}: {rec[1]}")
+
+            # expand the table_node if it was expanded before recreation
+            if table in nodes_to_expand:
+                table_node.expand()
 
         cur.close()
 
