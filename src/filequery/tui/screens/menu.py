@@ -26,18 +26,13 @@ class MenuModal(ModalScreen):
                 Button("exit filequery", id="exit-btn", classes="menu-btn menu-exit-btn"),
             )
     
-    @on(Button.Pressed, selector="#save-sql-btn")
-    def save_sql(self, event):
-        self.dismiss(MenuEvent.SAVE_SQL)
-
-    @on(Button.Pressed, selector="#save-result-btn")
-    def save_result(self, event):
-        self.dismiss(MenuEvent.SAVE_RESULT)
-
-    @on(Button.Pressed, selector="#close-btn")
-    def exit_modal(self, event):
-        self.dismiss()
-
-    @on(Button.Pressed, selector="#exit-btn")
-    def exit_modal(self, event):
-        self.dismiss(MenuEvent.EXIT)
+    @on(Button.Pressed)
+    def handle_button(self, event: Button.Pressed):
+        if event.button.id == "save-sql-btn":
+            self.dismiss(MenuEvent.SAVE_SQL)
+        elif event.button.id == "save-result-btn":
+            self.dismiss(MenuEvent.SAVE_RESULT)
+        elif event.button.id == "close-btn":
+            self.dismiss()
+        elif event.button.id == "exit-btn":
+            self.dismiss(MenuEvent.EXIT)
