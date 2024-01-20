@@ -16,7 +16,9 @@ Query CSV and Parquet files using SQL.
 
 ### TUI
 
-![filequery_tui](https://github.com/MarkyMan4/filequery/assets/37815834/b88fc0d0-0e88-408b-849e-c681e7de0e13)
+![filequery_tui](https://github.com/MarkyMan4/filequery/assets/37815834/202655ab-359e-4a42-a9eb-49227cf32f22)
+
+![filequery_menu](https://github.com/MarkyMan4/filequery/assets/37815834/57a58e3b-f283-43e9-8a9f-68c363d748af)
 
 ## Installation
 
