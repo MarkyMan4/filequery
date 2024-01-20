@@ -12,17 +12,16 @@ from textual.widgets import (DataTable, Footer, Input, Markdown, Tab, Tabs,
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
+from .screens.menu import MenuModal
+from .screens.menu_events import MenuEvent
 
 
 class DuckUI(App):
     BINDINGS = [
+        Binding(key="f1", action="toggle_menu", description="menu"),
         Binding(key="f2", action="toggle_help", description="help"),
         Binding(key="f9", action="execute_query", description="execute query"),
-        Binding(key="ctrl+q", action="save_sql", description="save SQL"),
-        Binding(key="ctrl+r", action="save_result", description="save result"),
         Binding(key="ctrl+p", action="close_dialog", description="close dialog"),
-        Binding(key="ctrl+n", action="new_tab", description="new tab"),
-        Binding(key="ctrl+t", action="close_tab", description="close tab"),
     ]
     CSS_PATH = "./styles/style.tcss"
 
@@ -179,7 +178,7 @@ class DuckUI(App):
             self.text_area.remove_class("focused")
 
     # handle key events outside of bindings
-    def on_key(self, event: events.Key):
+    async def on_key(self, event: events.Key):
         if event.key == "ctrl+shift+up":
             if self.text_area.has_focus:
                 self.tabs.focus()
@@ -194,6 +193,23 @@ class DuckUI(App):
             self.tables.focus()
         elif event.key == "ctrl+shift+right":
             self.text_area.focus()
+        elif event.key == "ctrl+n":
+            await self.action_new_tab()
+        elif event.key == "ctrl+t":
+            await self.action_close_tab()
+
+    def handle_menu_event(self,event: MenuEvent):
+        if event == MenuEvent.SAVE_SQL:
+            self.save_sql_input.display = True
+            self.save_sql_input.focus()
+        elif event == MenuEvent.SAVE_RESULT:
+            self.save_result_input.display = True
+            self.save_result_input.focus()
+        elif event == MenuEvent.EXIT:
+            self.exit()
+
+    def action_toggle_menu(self):
+        self.push_screen(MenuModal(), callback=self.handle_menu_event)
 
     def action_close_dialog(self):
         # close help and file name inputs and refocus on editor
@@ -201,14 +217,6 @@ class DuckUI(App):
         self.save_sql_input.display = False
         self.save_result_input.display = False
         self.text_area.focus()
-
-    def action_save_sql(self):
-        self.save_sql_input.display = True
-        self.save_sql_input.focus()
-
-    def action_save_result(self):
-        self.save_result_input.display = True
-        self.save_result_input.focus()
 
     def action_toggle_help(self):
         self.help_box.display = not self.help_box.display
