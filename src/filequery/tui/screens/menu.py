@@ -1,5 +1,3 @@
-import sys
-
 from textual import on
 from textual.binding import Binding
 from textual.containers import Container, Vertical

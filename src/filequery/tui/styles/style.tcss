@@ -51,11 +51,11 @@ Screen {
     display: none;
 }
 
-MenuModal {
+ModalScreen {
     align: center middle;
 }
 
-MenuModal > Container {
+ModalScreen > Container {
     width: 40%;
     height: 50%;
     align: center middle;
@@ -65,9 +65,13 @@ MenuModal > Container {
     overflow-y: scroll;
 }
 
-MenuModal > Container > Vertical {
+ModalScreen > Container > Vertical {
     height: auto;
     width: auto;
+}
+
+.centered {
+    text-align: center;
 }
 
 #menu-title {

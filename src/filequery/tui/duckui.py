@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from pathlib import Path
 from typing import List, Tuple
 
 import duckdb
@@ -12,6 +13,7 @@ from textual.widgets import (DataTable, Footer, Input, Markdown, Tab, Tabs,
 from textual.widgets.text_area import Selection
 
 from .help_content import help_md
+from .screens.file_browser import FileBrowser
 from .screens.menu import MenuModal
 from .screens.menu_events import MenuEvent
 
@@ -211,15 +213,27 @@ class DuckUI(App):
         elif event.key == "ctrl+t":
             await self.action_close_tab()
 
-    def handle_menu_event(self,event: MenuEvent):
+    def handle_menu_event(self, event: MenuEvent):
         if event == MenuEvent.SAVE_SQL:
             self.save_sql_input.display = True
             self.save_sql_input.focus()
+        elif event == MenuEvent.LOAD_SQL:
+            self.push_screen(FileBrowser(), callback=self.handle_file_browser_event)
         elif event == MenuEvent.SAVE_RESULT:
             self.save_result_input.display = True
             self.save_result_input.focus()
         elif event == MenuEvent.EXIT:
             self.exit()
+
+    def handle_file_browser_event(self, path: Path):
+        if path is None:
+            return
+    
+        with open(path) as file:
+            self.text_area.text = file.read()
+
+            # manually call this to ensure tab content is saved
+            self.handle_editor_content_changed()
 
     def action_toggle_menu(self):
         self.push_screen(MenuModal(), callback=self.handle_menu_event)
