@@ -110,5 +110,7 @@ class FileDb:
             self.db.execute(
                 f"copy ({query}) to '{output_filepath}' (header, delimiter '{delimiter}')"
             )
+        elif filetype == FileType.JSON:
+            self.db.execute(f"copy ({query}) to '{output_filepath}' (ARRAY true)")
         elif filetype == FileType.PARQUET:
             self.db.execute(f"copy ({query}) to '{output_filepath}'")
