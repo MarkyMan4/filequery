@@ -1,5 +1,3 @@
-import sys
-
 from textual import on
 from textual.binding import Binding
 from textual.containers import Container, Vertical
@@ -20,6 +18,7 @@ class MenuModal(ModalScreen):
             yield Vertical(
                 Static("Menu", id="menu-title"),
                 Rule(),
+                Button("load SQL", id="load-sql-btn", classes="menu-btn"),
                 Button("save SQL", id="save-sql-btn", classes="menu-btn"),
                 Button("save query result", id="save-result-btn", classes="menu-btn"),
                 Button("close menu", id="close-btn", classes="menu-btn"),
@@ -28,7 +27,9 @@ class MenuModal(ModalScreen):
     
     @on(Button.Pressed)
     def handle_button(self, event: Button.Pressed):
-        if event.button.id == "save-sql-btn":
+        if event.button.id == "load-sql-btn":
+            self.dismiss(MenuEvent.LOAD_SQL)
+        elif event.button.id == "save-sql-btn":
             self.dismiss(MenuEvent.SAVE_SQL)
         elif event.button.id == "save-result-btn":
             self.dismiss(MenuEvent.SAVE_RESULT)
