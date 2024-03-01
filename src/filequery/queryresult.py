@@ -6,9 +6,6 @@ from rich.table import Table
 
 
 class QueryResult:
-    result_cols: List[str]
-    records: List[List[Any]]
-
     def __init__(self, result: Dict[str, np.ndarray]):
         self.result_cols = {}
 
@@ -34,6 +31,20 @@ class QueryResult:
     def __str__(self) -> str:
         # formats as a csv
         return self.format_with_delimiter(",")
+    
+    @property
+    def dict_records(self) -> List[Dict[str, Any]]:
+        result = []
+
+        for rec in self.records:
+            dict_record = {}
+
+            for key, value in zip(self.result_cols, rec):
+                dict_record[key] = value
+
+            result.append(dict_record)
+
+        return result
 
     def format_with_delimiter(self, delimiter):
         col_names = list(self.result_cols.keys())

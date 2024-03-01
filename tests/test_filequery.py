@@ -111,6 +111,39 @@ class TestFileQuery(unittest.TestCase):
 
         self.assertEqual(len(res.records), 4)
 
+    def test_dict_records_length_csv(self):
+        fdb = FileDb("example/test.csv")
+        res = fdb.exec_query("select * from test")
+
+        self.assertEqual(len(res.dict_records), 3)
+
+    def test_dict_records_keys_csv(self):
+        fdb = FileDb("example/test.csv")
+        res = fdb.exec_query("select * from test")
+
+        for rec in res.dict_records:
+            self.assertListEqual(list(rec.keys()), ["col1", "col2", "col3"])
+
+    def test_dict_records_length_json(self):
+        fdb = FileDb("example/ndjson_test.ndjson")
+        res = fdb.exec_query("select * from ndjson_test")
+
+        self.assertEqual(len(res.dict_records), 4)
+
+    def test_dict_records_keys_json(self):
+        fdb = FileDb("example/ndjson_test.ndjson")
+        res = fdb.exec_query("select * from ndjson_test")
+        
+        for rec in res.dict_records:
+            self.assertListEqual(list(rec.keys()), ["id", "value", "nested"])
+
+    def test_dict_records_nested_keys_json(self):
+        fdb = FileDb("example/ndjson_test.ndjson")
+        res = fdb.exec_query("select * from ndjson_test")
+        
+        for rec in res.dict_records:
+            self.assertListEqual(list(rec["nested"].keys()), ["subid", "subval"])
+
 
 class TestFileQueryCli(unittest.TestCase):
     #####################################################
