@@ -35,6 +35,9 @@ class DuckUI(App):
 
         # mapping from tab ID to editor content, tab IDs are "tab-1", "tab-2" and so on
         self.tab_content = defaultdict(str)
+        
+        # keep track of last query ran, so if user exports result, can use a duckdb copy statement
+        self.last_query = ""
 
         super().__init__()
 
@@ -143,19 +146,7 @@ class DuckUI(App):
     @on(Input.Submitted, selector="#result-file-input")
     def handle_result_file_name_input(self):
         try:
-            with open(self.save_result_input.value, "w") as f:
-                cols = self.result_table.columns
-                rows = self.result_table._data
-
-                formatted_cols = [f'"{cols[col].label}"' for col in cols]
-                f.write(",".join(formatted_cols))
-                f.write("\n")
-
-                for row in rows:
-                    row_data = rows[row]
-                    formatted_row = [f'"{row_data[col]}"' for col in row_data]
-                    f.write(",".join(formatted_row))
-                    f.write("\n")
+            self.conn.execute(f"copy ({self.last_query}) to '{self.save_result_input.value}' (header)")
         except:
             # ignore for now, find a way to display an error message
             pass
@@ -360,6 +351,7 @@ class DuckUI(App):
         try:
             cur.execute(query)
             result = cur.fetchall()
+            self.last_query = query
         except Exception as e:
             self._display_error_in_table(str(e))
             cur.close()
@@ -373,8 +365,6 @@ class DuckUI(App):
         except Exception as e:
             self._display_error_in_table(str(e))
         finally:
-            cur.close()
-            cur.close()
             cur.close()
 
         # after executing a statement, update the table list in case any tables were created or dropped
