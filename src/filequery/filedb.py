@@ -8,7 +8,7 @@ from .filetype import FileType
 from .queryresult import QueryResult
 
 READ_FUNCS = {
-    FileType.CSV: "read_csv_auto",
+    FileType.CSV: "read_csv",
     FileType.PARQUET: "read_parquet",
     FileType.JSON: "read_json_auto",
     FileType.NDJSON: "read_ndjson_auto",
