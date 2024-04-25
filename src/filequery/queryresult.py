@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 import numpy as np
+from rich import markup
 from rich.console import Console
 from rich.table import Table
 
@@ -74,7 +75,7 @@ class QueryResult:
                 table.add_column(col, justify=justify)
 
             for rec in self.records:
-                stringified = [str(r) for r in rec]
+                stringified = [markup.escape(str(r)) for r in rec]
                 table.add_row(*stringified)
 
             console = Console()
