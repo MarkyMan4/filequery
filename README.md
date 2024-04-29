@@ -61,7 +61,9 @@ options:
 ```
 
 For basic usage, provide a path to a CSV or Parquet file and a query to execute against it. The table name will be the 
-file name without the extension.
+file name without the extension. If the file name does not conform to DuckDB's rules for unquoted identifiers, the 
+table name will need to be wrapped in double quotes. For example, a file named `my data.csv` would be queried as 
+`select * from "my data"`.
 
 ```bash
 filequery --filename example/test.csv --query 'select * from test'
