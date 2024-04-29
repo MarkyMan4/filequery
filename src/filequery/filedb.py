@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List
 
 import duckdb
@@ -33,29 +34,6 @@ class FileDb:
         """
         self.db = duckdb.connect(":memory:")
 
-        # filename should be path to file
-        def create_table_from_file(filename: str):
-            base_filename = os.path.basename(filename).lower()
-            file_ext = base_filename.split(".")[-1]
-            filetype = FILE_EXT_MAP.get(file_ext)
-
-            if filetype is None:
-                raise InvalidFileTypeException
-
-            table_name = os.path.splitext(base_filename)[0]
-            read_func = READ_FUNCS[filetype]
-
-            # for csv, json and ndjson, set sample size to -1 (sample all records)
-            # this is not needed for parquet
-            if filetype == FileType.PARQUET:
-                self.db.execute(
-                    f"create table {table_name} as select * from {read_func}('{filename}');"
-                )
-            else:
-                self.db.execute(
-                    f"create table {table_name} as select * from {read_func}('{filename}', SAMPLE_SIZE=-1);"
-                )
-
         if os.path.isdir(filepath):
             # only take accepted file types
             files = []
@@ -71,9 +49,72 @@ class FileDb:
                     files.append(file)
 
             for file in files:
-                create_table_from_file(os.path.join(filepath, file))
+                self._create_table_from_file(os.path.join(filepath, file))
         else:
-            create_table_from_file(filepath)
+            self._create_table_from_file(filepath)
+
+    def _create_table_from_file(self, filepath: str):
+        """
+        create a table in the database from a file
+
+        :param filename: path to a CSV, JSON or Parquet file
+        :type filename: str
+        :raises InvalidFileTypeException: raised if file is not CSV, JSON or Parquet
+        """
+        base_filename = os.path.basename(filepath).lower()
+        table_name, file_ext = os.path.splitext(base_filename)
+        file_ext = file_ext.replace(".", "")
+        filetype = FILE_EXT_MAP.get(file_ext)
+
+        if filetype is None:
+            raise InvalidFileTypeException
+
+        read_func = READ_FUNCS[filetype]
+
+        if self._should_quote_table_name(table_name):
+            table_name = f'"{table_name}"'
+
+        # for csv, json and ndjson, set sample size to -1 (sample all records)
+        # this is not needed for parquet
+        if filetype == FileType.PARQUET:
+            self.db.execute(
+                f"create table {table_name} as select * from {read_func}('{filepath}');"
+            )
+        else:
+            self.db.execute(
+                f"create table {table_name} as select * from {read_func}('{filepath}', SAMPLE_SIZE=-1);"
+            )
+
+    def _should_quote_table_name(self, table_name: str) -> bool:
+        """
+        Determine if a table name needs to be wrapped in double quotes. It needs to be wrapped 
+        in quotes if it does not follow these rules:
+        - starts with a number or special characters
+        - contains whitespace or special characters
+        - it is a reserved word
+
+        :param table_name: name of table to check - this is the file name without the extension
+        :type table_name: str
+        :return: whether the table name needs to be wrapped in double quotes
+        :rtype: bool
+        """
+        # first check if it starts with a number or special character, or if it contains special characters
+        valid_table_name_regex = re.compile("^[a-zA-Z_]+[a-zA-Z0-9_]+$")
+        if not valid_table_name_regex.match(table_name):
+            return True
+
+        # then check if it's a reserved word - using DuckDB's function duckdb_keywords()
+        query = f"""
+            select *
+            from duckdb_keywords()
+            where keyword_name = '{table_name.lower()}'
+        """
+
+        res = self.db.execute(query)
+        if len(res.fetchall()) > 0:
+            return True
+        
+        return False
 
     def exec_query(self, query: str) -> QueryResult:
         """

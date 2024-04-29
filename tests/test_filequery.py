@@ -133,16 +133,64 @@ class TestFileQuery(unittest.TestCase):
     def test_dict_records_keys_json(self):
         fdb = FileDb("example/ndjson_test.ndjson")
         res = fdb.exec_query("select * from ndjson_test")
-        
+
         for rec in res.dict_records:
             self.assertListEqual(list(rec.keys()), ["id", "value", "nested"])
 
     def test_dict_records_nested_keys_json(self):
         fdb = FileDb("example/ndjson_test.ndjson")
         res = fdb.exec_query("select * from ndjson_test")
-        
+
         for rec in res.dict_records:
             self.assertListEqual(list(rec["nested"].keys()), ["subid", "subval"])
+
+    def test_valid_unquoted_identifier(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("test_table")
+
+        self.assertFalse(should_quote)
+
+    def test_filename_with_leading_underscore(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("_test_table")
+
+        self.assertFalse(should_quote)
+
+    def test_filename_with_numbers(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("test_table_1")
+
+        self.assertFalse(should_quote)
+
+    def test_filename_with_hyphen(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("test-table")
+
+        self.assertTrue(should_quote)
+
+    def test_filename_with_leading_number(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("1test")
+
+        self.assertTrue(should_quote)
+
+    def test_filename_with_spaces(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("test table")
+
+        self.assertTrue(should_quote)
+
+    def test_filename_with_leading_special_char(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name("$test")
+
+        self.assertTrue(should_quote)
+
+    def test_filename_with_leading_space(self):
+        fdb = FileDb("example/test.csv")
+        should_quote = fdb._should_quote_table_name(" test")
+
+        self.assertTrue(should_quote)
 
 
 class TestFileQueryCli(unittest.TestCase):
