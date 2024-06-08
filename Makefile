@@ -2,7 +2,7 @@
 
 # create a build - outputs to dist directory
 build-pkg:
-	python -m build
+	poetry build
 
 # upload to pypi
 deploy:
